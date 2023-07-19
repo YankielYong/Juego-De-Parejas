@@ -29,6 +29,7 @@ import java.awt.SystemColor;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
+import logica.Juego;
 import logica.Jugador;
 
 public class Inicio extends JFrame {
@@ -69,6 +70,56 @@ public class Inicio extends JFrame {
 	 */
 	private JPanel panelTablero;
 	private JPanel panelDados;
+	/*
+	 * Casillas
+	 */
+	private JLabel casilla00;
+	private JLabel casilla01;
+	private JLabel casilla02;
+	private JLabel casilla03;
+	private JLabel casilla04;
+	private JLabel casilla05;
+	private JLabel casilla06;
+	private JLabel casilla07;
+	private JLabel casilla08;
+	private JLabel casilla09;
+	private JLabel casilla10;
+	private JLabel casilla11;
+	private JLabel casilla12;
+	private JLabel casilla13;
+	private JLabel casilla14;
+	private JLabel casilla15;
+	private JLabel casilla16;
+	private JLabel casilla17;
+	private JLabel casilla18;
+	private JLabel casilla19;
+	private JLabel casilla20;
+	private JLabel casilla21;
+	private JLabel casilla22;
+	private JLabel casilla23;
+	private JLabel casilla24;
+	private JLabel casilla25;
+	private JLabel casilla26;
+	private JLabel casilla27;
+	private JLabel casilla28;
+	private JLabel casilla29;
+	private JLabel casilla30;
+	private JLabel casilla31;
+	private JLabel casilla32;
+	private JLabel casilla33;
+	private JLabel casilla34;
+	private JLabel casilla35;
+	private JLabel casilla36;
+	private JLabel casilla37;
+	private JLabel casilla38;
+	private JLabel casilla39;
+	private JLabel casilla40;
+	private JLabel escalera01;
+	private JLabel escalera02;
+	private JLabel puente01;
+	private JLabel puente02;
+	
+	private Juego game;
 	
 	
 
@@ -331,12 +382,76 @@ public class Inicio extends JFrame {
 		panelDados = new JPanel();
 		panelDados.setBackground(Color.orange);
 		panelDados.setBorder(new EmptyBorder(5, 5, 5, 5));
-		panelDados.setBounds(1130, 605, 140, 80);
+		panelDados.setBounds(1130, 15, 120, 100);
 		panelDados.setLayout(null);
 		panelTablero.add(panelDados);
+		
 	}
 
-	
+	private void inicializarCasillas(){
+		casilla00 = new JLabel("");
+		casilla00.setBounds(30, 540, 140, 140);
+		casilla00.setIcon(game.getCasillas().get(0).getImagenP());
+		casilla00.setBorder(new LineBorder(Color.black, 1));
+		panelTablero.add(casilla00);
+		
+		/*casilla12 = new JLabel("");
+		casilla12.setBounds(1130, 320, 120, 90);
+		casilla12.setIcon(game.getCasillas().get(12).getImagenP());
+		casilla12.setBorder(new LineBorder(Color.black, 1));
+		panelTablero.add(casilla12);*/
+		
+		casilla18 = new JLabel("");
+		casilla18.setBounds(890, 320, 120, 90);
+		casilla18.setIcon(game.getCasillas().get(18).getImagenP());
+		casilla18.setBorder(new LineBorder(Color.black, 1));
+		panelTablero.add(casilla18);
+		
+		casilla24 = new JLabel("");
+		casilla24.setBounds(290, 410, 120, 90);
+		casilla24.setIcon(game.getCasillas().get(24).getImagenP());
+		casilla24.setBorder(new LineBorder(Color.black, 1));
+		panelTablero.add(casilla24);
+		
+		casilla34 = new JLabel("");
+		casilla34.setBounds(650, 140, 120, 90);
+		casilla34.setIcon(game.getCasillas().get(34).getImagenP());
+		casilla34.setBorder(new LineBorder(Color.black, 1));
+		panelTablero.add(casilla34);
+		
+		casilla38 = new JLabel("");
+		casilla38.setBounds(290, 50, 120, 90);
+		casilla38.setIcon(game.getCasillas().get(38).getImagenP());
+		casilla38.setBorder(new LineBorder(Color.black, 1));
+		panelTablero.add(casilla38);
+		
+		casilla40 = new JLabel("");
+		casilla40.setBounds(30, 30, 140, 140);
+		casilla40.setIcon(game.getCasillas().get(40).getImagenP());
+		casilla40.setBorder(new LineBorder(Color.black, 1));
+		panelTablero.add(casilla40);
+		
+		escalera01 = new JLabel("");
+		escalera01.setBounds(290, 500, 120, 90);
+		escalera01.setIcon(new ImageIcon(Inicio.class.getResource("/imagenes_casillas/escalera.png")));
+		panelTablero.add(escalera01);
+		
+		escalera02 = new JLabel("");
+		escalera02.setBounds(290, 140, 120, 90);
+		escalera02.setIcon(new ImageIcon(Inicio.class.getResource("/imagenes_casillas/escalera.png")));
+		panelTablero.add(escalera02);
+		
+		puente01 = new JLabel("");
+		puente01.setBounds(1010, 320, 120, 90);
+		puente01.setIcon(new ImageIcon(Inicio.class.getResource("/imagenes_casillas/puente.png")));
+		panelTablero.add(puente01);
+		
+		puente02 = new JLabel("");
+		puente02.setBounds(770, 140, 120, 90);
+		puente02.setIcon(new ImageIcon(Inicio.class.getResource("/imagenes_casillas/puente.png")));
+		panelTablero.add(puente02);
+		
+	}
 	/**
 	 * Realiza la accion determinada de cada tecla
 	 * @param txtID el id del JTextField donde se presiono la tecla
@@ -371,6 +486,8 @@ public class Inicio extends JFrame {
 		contentPane.remove(panelInicio);
 		repaint();
 		contentPane.add(panelTablero);
+		game = new Juego(j1, j2);
+		inicializarCasillas();
 	}
 
 	/**
