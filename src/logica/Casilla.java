@@ -1,14 +1,15 @@
 package logica;
 
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 public class Casilla {
 	
 	private String mensaje;
-	private ImageIcon imagenP;
+	private Icon imagenP;
 	private ImageIcon imagenG;
 	
-	public Casilla(String mensaje, ImageIcon imagenP, ImageIcon imagenG) {
+	public Casilla(String mensaje, Icon imagenP, ImageIcon imagenG) {
 		this.mensaje = mensaje;
 		this.imagenP = imagenP;
 		this.imagenG = imagenG;
@@ -25,10 +26,10 @@ public class Casilla {
 	public void setMensaje(String mensaje) {
 		this.mensaje = mensaje;
 	}
-	public ImageIcon getImagenP() {
+	public Icon getImagenP() {
 		return imagenP;
 	}
-	public void setImagenP(ImageIcon imagenP) {
+	public void setImagenP(Icon imagenP) {
 		this.imagenP = imagenP;
 	}
 	public ImageIcon getImagenG() {

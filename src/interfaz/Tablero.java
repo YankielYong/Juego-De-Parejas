@@ -1,6 +1,5 @@
 package interfaz;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.SystemColor;
@@ -21,6 +20,7 @@ import util.MyButtonModel;
 
 public class Tablero extends JFrame {
 
+	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JPanel panelSuperior;
 	private JButton btnCerrar;
