@@ -144,6 +144,9 @@ public class Inicio extends JFrame {
 	}
 
 	public Inicio() {
+		setTitle("Juego de Parejas");
+		
+		
 		
 		/*-----------------------------------*\
 		|     Panel General Con Sus Datos     |
@@ -415,6 +418,12 @@ public class Inicio extends JFrame {
 		panelTablero.add(casilla00);
 		
 		casilla01 = new JLabel("");
+		casilla01.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(1);
+			}
+		});
 		casilla01.setBounds(170, 590, 120, 90);
 		casilla01.setIcon(game.getCasillas().get(1).getImagenP());
 		casilla01.setBorder(new LineBorder(Color.black, 1));
@@ -432,41 +441,185 @@ public class Inicio extends JFrame {
 		casilla02.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla02);
 		
+		casilla03 = new JLabel("");
+		casilla03.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(3);
+			}
+		});
+		casilla03.setBounds(410, 590, 120, 90);
+		casilla03.setIcon(game.getCasillas().get(3).getImagenP());
+		casilla03.setBorder(new LineBorder(Color.black, 1));
+		panelTablero.add(casilla03);
+		
 		casilla04 = new JLabel("");
+		casilla04.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(4);
+			}
+		});
 		casilla04.setBounds(530, 590, 120, 90);
 		casilla04.setIcon(game.getCasillas().get(4).getImagenP());
 		casilla04.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla04);
 		
 		casilla05 = new JLabel("");
+		casilla05.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(5);
+			}
+		});
 		casilla05.setBounds(650, 590, 120, 90);
 		casilla05.setIcon(game.getCasillas().get(5).getImagenP());
 		casilla05.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla05);
 		
+		casilla06 = new JLabel("");
+		casilla06.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(6);
+			}
+		});
+		casilla06.setBounds(770, 590, 120, 90);
+		casilla06.setIcon(game.getCasillas().get(6).getImagenP());
+		casilla06.setBorder(new LineBorder(Color.black, 1));
+		panelTablero.add(casilla06);
+		
+		casilla07 = new JLabel("");
+		casilla07.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(7);
+			}
+		});
+		casilla07.setBounds(890, 590, 120, 90);
+		casilla07.setIcon(game.getCasillas().get(7).getImagenP());
+		casilla07.setBorder(new LineBorder(Color.black, 1));
+		panelTablero.add(casilla07);
+		
+		casilla08 = new JLabel("");
+		casilla08.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(8);
+			}
+		});
+		casilla08.setBounds(1010, 590, 120, 90);
+		casilla08.setIcon(game.getCasillas().get(8).getImagenP());
+		casilla08.setBorder(new LineBorder(Color.black, 1));
+		panelTablero.add(casilla08);
+		
 		casilla09 = new JLabel("");
+		casilla09.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(9);
+			}
+		});
 		casilla09.setBounds(1130, 590, 120, 90);
-		casilla09.setIcon(game.getCasillas().get(1).getImagenP());
+		casilla09.setIcon(game.getCasillas().get(9).getImagenP());
 		casilla09.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla09);
 		
+		casilla10 = new JLabel("");
+		casilla10.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(10);
+			}
+		});
+		casilla10.setBounds(1130, 500, 120, 90);
+		casilla10.setIcon(game.getCasillas().get(10).getImagenP());
+		casilla10.setBorder(new LineBorder(Color.black, 1));
+		panelTablero.add(casilla10);
+		
+		casilla11 = new JLabel("");
+		casilla11.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(11);
+			}
+		});
+		casilla11.setBounds(1130, 410, 120, 90);
+		casilla11.setIcon(game.getCasillas().get(11).getImagenP());
+		casilla11.setBorder(new LineBorder(Color.black, 1));
+		panelTablero.add(casilla11);
+		
 		casilla12 = new JLabel("");
+		casilla12.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(12);
+			}
+		});
 		casilla12.setBounds(1130, 320, 120, 90);
 		casilla12.setIcon(game.getCasillas().get(12).getImagenP());
 		casilla12.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla12);
 		
+		casilla13 = new JLabel("");
+		casilla13.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(13);
+			}
+		});
+		casilla13.setBounds(1130, 230, 120, 90);
+		casilla13.setIcon(game.getCasillas().get(13).getImagenP());
+		casilla13.setBorder(new LineBorder(Color.black, 1));
+		panelTablero.add(casilla13);
+		
 		casilla14 = new JLabel("");
+		casilla14.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(14);
+			}
+		});
 		casilla14.setBounds(1130,140, 120, 90);
 		casilla14.setIcon(game.getCasillas().get(14).getImagenP());
 		casilla14.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla14);
 		
+		casilla15 = new JLabel("");
+		casilla15.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(15);
+			}
+		});
+		casilla15.setBounds(1010,140, 120, 90);
+		casilla15.setIcon(game.getCasillas().get(15).getImagenP());
+		casilla15.setBorder(new LineBorder(Color.black, 1));
+		panelTablero.add(casilla15);
+		
 		casilla16 = new JLabel("");
+		casilla16.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(16);
+			}
+		});
 		casilla16.setBounds(890,140, 120, 90);
 		casilla16.setIcon(game.getCasillas().get(16).getImagenP());
 		casilla16.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla16);
+		
+		casilla17 = new JLabel("");
+		casilla17.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(17);
+			}
+		});
+		casilla17.setBounds(890, 230, 120, 90);
+		casilla17.setIcon(game.getCasillas().get(17).getImagenP());
+		casilla17.setBorder(new LineBorder(Color.black, 1));
+		panelTablero.add(casilla17);
 		
 		casilla18 = new JLabel("");
 		casilla18.setBounds(890, 320, 120, 90);
@@ -475,22 +628,64 @@ public class Inicio extends JFrame {
 		panelTablero.add(casilla18);
 		
 		casilla19 = new JLabel("");
+		casilla19.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(19);
+			}
+		});
 		casilla19.setBounds(890,410, 120, 90);
 		casilla19.setIcon(game.getCasillas().get(19).getImagenP());
 		casilla19.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla19);
 		
+		casilla20 = new JLabel("");
+		casilla20.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(20);
+			}
+		});
+		casilla20.setBounds(770,410, 120, 90);
+		casilla20.setIcon(game.getCasillas().get(20).getImagenP());
+		casilla20.setBorder(new LineBorder(Color.black, 1));
+		panelTablero.add(casilla20);
+		
 		casilla21 = new JLabel("");
+		casilla21.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(21);
+			}
+		});
 		casilla21.setBounds(650,410, 120, 90);
 		casilla21.setIcon(game.getCasillas().get(21).getImagenP());
 		casilla21.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla21);
 		
 		casilla22 = new JLabel("");
+		casilla22.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(22);
+			}
+		});
 		casilla22.setBounds(530, 410, 120, 90);
 		casilla22.setIcon(game.getCasillas().get(22).getImagenP());
 		casilla22.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla22);
+		
+		casilla23 = new JLabel("");
+		casilla23.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(23);
+			}
+		});
+		casilla23.setBounds(410, 410, 120, 90);
+		casilla23.setIcon(game.getCasillas().get(23).getImagenP());
+		casilla23.setBorder(new LineBorder(Color.black, 1));
+		panelTablero.add(casilla23);
 		
 		casilla24 = new JLabel("");
 		casilla24.setBounds(290, 410, 120, 90);
@@ -498,35 +693,113 @@ public class Inicio extends JFrame {
 		casilla24.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla24);
 		
+		casilla25 = new JLabel("");
+		casilla25.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(25);
+			}
+		});
+		casilla25.setBounds(170, 410, 120, 90);
+		casilla25.setIcon(game.getCasillas().get(25).getImagenP());
+		casilla25.setBorder(new LineBorder(Color.black, 1));
+		panelTablero.add(casilla25);
+		
 		casilla26 = new JLabel("");
+		casilla26.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(26);
+			}
+		});
 		casilla26.setBounds(50, 410, 120, 90);
 		casilla26.setIcon(game.getCasillas().get(26).getImagenP());
 		casilla26.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla26);
 		
+		casilla27 = new JLabel("");
+		casilla27.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(27);
+			}
+		});
+		casilla27.setBounds(50, 320, 120, 90);
+		casilla27.setIcon(game.getCasillas().get(27).getImagenP());
+		casilla27.setBorder(new LineBorder(Color.black, 1));
+		panelTablero.add(casilla27);
+		
 		casilla28 = new JLabel("");
+		casilla28.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(28);
+			}
+		});
 		casilla28.setBounds(50, 230, 120, 90);
 		casilla28.setIcon(game.getCasillas().get(28).getImagenP());
 		casilla28.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla28);
 		
 		casilla29 = new JLabel("");
+		casilla29.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(29);
+			}
+		});
 		casilla29.setBounds(170, 230, 120, 90);
 		casilla29.setIcon(game.getCasillas().get(29).getImagenP());
 		casilla29.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla29);
 		
 		casilla30 = new JLabel("");
+		casilla30.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(30);
+			}
+		});
 		casilla30.setBounds(290, 230, 120, 90);
 		casilla30.setIcon(game.getCasillas().get(30).getImagenP());
 		casilla30.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla30);
 		
+		casilla31 = new JLabel("");
+		casilla31.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(31);
+			}
+		});
+		casilla31.setBounds(410, 230, 120, 90);
+		casilla31.setIcon(game.getCasillas().get(31).getImagenP());
+		casilla31.setBorder(new LineBorder(Color.black, 1));
+		panelTablero.add(casilla31);
+		
 		casilla32 = new JLabel("");
+		casilla32.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(32);
+			}
+		});
 		casilla32.setBounds(530, 230, 120, 90);
 		casilla32.setIcon(game.getCasillas().get(32).getImagenP());
 		casilla32.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla32);
+		
+		casilla33 = new JLabel("");
+		casilla33.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(33);
+			}
+		});
+		casilla33.setBounds(650, 230, 120, 90);
+		casilla33.setIcon(game.getCasillas().get(33).getImagenP());
+		casilla33.setBorder(new LineBorder(Color.black, 1));
+		panelTablero.add(casilla33);
 		
 		casilla34 = new JLabel("");
 		casilla34.setBounds(650, 140, 120, 90);
@@ -534,7 +807,37 @@ public class Inicio extends JFrame {
 		casilla34.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla34);
 		
+		casilla35 = new JLabel("");
+		casilla35.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(35);
+			}
+		});
+		casilla35.setBounds(650, 50, 120, 90);
+		casilla35.setIcon(game.getCasillas().get(35).getImagenP());
+		casilla35.setBorder(new LineBorder(Color.black, 1));
+		panelTablero.add(casilla35);
+		
+		casilla36 = new JLabel("");
+		casilla36.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(36);
+			}
+		});
+		casilla36.setBounds(530, 50, 120, 90);
+		casilla36.setIcon(game.getCasillas().get(36).getImagenP());
+		casilla36.setBorder(new LineBorder(Color.black, 1));
+		panelTablero.add(casilla36);
+		
 		casilla37 = new JLabel("");
+		casilla37.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(37);
+			}
+		});
 		casilla37.setBounds(410, 50, 120, 90);
 		casilla37.setIcon(game.getCasillas().get(37).getImagenP());
 		casilla37.setBorder(new LineBorder(Color.black, 1));
@@ -546,7 +849,25 @@ public class Inicio extends JFrame {
 		casilla38.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla38);
 		
+		casilla39 = new JLabel("");
+		casilla39.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(39);
+			}
+		});
+		casilla39.setBounds(170, 50, 120, 90);
+		casilla39.setIcon(game.getCasillas().get(39).getImagenP());
+		casilla39.setBorder(new LineBorder(Color.black, 1));
+		panelTablero.add(casilla39);
+		
 		casilla40 = new JLabel("");
+		casilla40.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				mostrarCasilla(40);
+			}
+		});
 		casilla40.setBounds(30, 30, 140, 140);
 		casilla40.setIcon(game.getCasillas().get(40).getImagenP());
 		casilla40.setBorder(new LineBorder(Color.black, 1));
