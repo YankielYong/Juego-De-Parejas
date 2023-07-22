@@ -4,6 +4,7 @@ import interfaz.Inicio;
 
 import java.awt.Image;
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -36,6 +37,10 @@ public class Juego {
 		return casillas;
 	}
 
+	public int lanzarDado(){
+		return new Random().nextInt(6) + 1;
+	}
+	
 	private void crearCasillas(){
 		ImageIcon imgBajarEscalera = new ImageIcon(Inicio.class.getResource("/imagenes_casillas/baja escalera.PNG"));
 		Image bajarEscaleraArr = imgBajarEscalera.getImage().getScaledInstance(120, 90, Image.SCALE_SMOOTH);

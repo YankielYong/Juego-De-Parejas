@@ -30,6 +30,8 @@ import javax.swing.SwingConstants;
 import java.awt.SystemColor;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import logica.Juego;
 import logica.Jugador;
@@ -71,7 +73,6 @@ public class Inicio extends JFrame {
 	 * Panel donde se mostrara el tablero
 	 */
 	private JPanel panelTablero;
-	private JPanel panelDados;
 	/*
 	 * Panel donde saldra el reto
 	 */
@@ -125,10 +126,31 @@ public class Inicio extends JFrame {
 	private JLabel escalera02;
 	private JLabel puente01;
 	private JLabel puente02;
-	
+	/*
+	 * Zona del dado
+	 */
+	private JLabel nombreJugador;
+	private JLabel lanzaDados;
+	private JPanel panelDados;
+	private JLabel dado;
+	private Icon dado1;
+	private Icon dado2;
+	private Icon dado3;
+	private Icon dado4;
+	private Icon dado5;
+	private Icon dado6;
+	private int tirada;
+	private Timer timer;
+	private boolean isCanceled = true;
+	/*
+	 * Para controlar animacion del dado
+	 */
+	private TimerTask contTimerTask;
+	private Timer controlador;
+
 	private Juego game;
-	
-	
+
+
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -144,14 +166,12 @@ public class Inicio extends JFrame {
 	}
 
 	public Inicio() {
-		setTitle("Juego de Parejas");
-		
-		
-		
+
 		/*-----------------------------------*\
 		|     Panel General Con Sus Datos     |
 		\*-----------------------------------*/
 		setResizable(false);
+		setTitle("Juego de Parejas");
 		setUndecorated(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(0, 0, 1280, 720);
@@ -162,8 +182,8 @@ public class Inicio extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(null);
 		setContentPane(contentPane);
-		
-		
+
+
 		/*--------------------------------------------------------*\
 		|     Panel Superior Con Botones de cerrar y minimizar     |
 		\*--------------------------------------------------------*/
@@ -191,7 +211,7 @@ public class Inicio extends JFrame {
 		ImageIcon imgCerrar = new ImageIcon(Inicio.class.getResource("/imagenes/close.png"));
 		Image cerrarArr = imgCerrar.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
 		Icon iconCerrar = new ImageIcon(cerrarArr);
-		
+
 		btnCerrar = new JButton("");
 		btnCerrar.setIcon(iconCerrar);
 		btnCerrar.addMouseListener(new MouseAdapter() {
@@ -244,7 +264,7 @@ public class Inicio extends JFrame {
 		btnMinimizar.setContentAreaFilled(false);
 		btnMinimizar.setBorderPainted(false);
 		panelSuperior.add(btnMinimizar);
-		
+
 
 		/*---------------------------------------------------------------*\
 		|     Panel Inicio para introducir los datos de los jugadores     |
@@ -291,8 +311,8 @@ public class Inicio extends JFrame {
 			public void keyTyped(KeyEvent e) {
 				int key = e.getKeyChar();
 				boolean ok = false;
-					if((key >= 65 && key <= 90) || (key >= 97 && key <= 122))
-						ok = true;
+				if((key >= 65 && key <= 90) || (key >= 97 && key <= 122))
+					ok = true;
 				if(!ok)
 					e.consume();
 			}
@@ -323,8 +343,8 @@ public class Inicio extends JFrame {
 			public void keyTyped(KeyEvent e) {
 				int key = e.getKeyChar();
 				boolean ok = false;
-					if((key >= 65 && key <= 90) || (key >= 97 && key <= 122))
-						ok = true;
+				if((key >= 65 && key <= 90) || (key >= 97 && key <= 122))
+					ok = true;
 				if(!ok)
 					e.consume();
 			}
@@ -342,6 +362,7 @@ public class Inicio extends JFrame {
 				llamarPanelTablero(panelInicio);
 				game = new Juego(j1, j2);
 				inicializarCasillas();
+				inicializarZonaDados();
 			}
 		});
 		btnIniciar.setModel(new MyButtonModel());
@@ -385,8 +406,8 @@ public class Inicio extends JFrame {
 		lblEmoji.setIcon(new ImageIcon(Inicio.class.getResource("/imagenes/emoji enamorado 96.png")));
 		lblEmoji.setBounds(1091, 270, 98, 98);
 		panelInicio.add(lblEmoji);
-		
-		
+
+
 		/*---------------------*\
 		|     Panel Tablero     |
 		\*---------------------*/
@@ -394,20 +415,121 @@ public class Inicio extends JFrame {
 		panelTablero.setBackground(Color.WHITE);
 		panelTablero.setBounds(1, 27, 1278, 692);
 		panelTablero.setLayout(null);
-		
+
 		panelDados = new JPanel();
-		panelDados.setBackground(Color.orange);
+		panelDados.setBackground(new Color(200, 0, 0));
 		panelDados.setBorder(new EmptyBorder(5, 5, 5, 5));
 		panelDados.setBounds(1130, 15, 120, 100);
 		panelDados.setLayout(null);
 		panelTablero.add(panelDados);
-		
-		
+
 		
 		
 	}
 
-	/**m
+	/**
+	 * Inicializa y coloca lo relacionado al dado
+	 */
+	private void inicializarZonaDados(){
+		nombreJugador = new JLabel(j1.getNick());
+		nombreJugador.setHorizontalAlignment(SwingConstants.CENTER);
+		nombreJugador.setFont(new Font("DomBold BT", Font.BOLD, 50));
+		nombreJugador.setForeground(Color.black);
+		nombreJugador.setBounds(890, 20, 230, 60);
+		panelTablero.add(nombreJugador);
+
+		lanzaDados = new JLabel("Toque el dado para lanzar");
+		lanzaDados.setHorizontalAlignment(SwingConstants.CENTER);
+		lanzaDados.setFont(new Font("Comic Sans MS", Font.BOLD, 18));
+		lanzaDados.setForeground(Color.black);
+		lanzaDados.setBounds(890, 75, 230, 30);
+		panelTablero.add(lanzaDados);
+
+		ImageIcon imgDado1 = new ImageIcon(Inicio.class.getResource("/caras_dado/dado 1.png"));
+		Image imageDado1 = imgDado1.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
+		dado1 = new ImageIcon(imageDado1);
+
+		ImageIcon imgDado2 = new ImageIcon(Inicio.class.getResource("/caras_dado/dado 2.png"));
+		Image imageDado2 = imgDado2.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
+		dado2 = new ImageIcon(imageDado2);
+
+		ImageIcon imgDado3 = new ImageIcon(Inicio.class.getResource("/caras_dado/dado 3.png"));
+		Image imageDado3 = imgDado3.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
+		dado3 = new ImageIcon(imageDado3);
+
+		ImageIcon imgDado4 = new ImageIcon(Inicio.class.getResource("/caras_dado/dado 4.png"));
+		Image imageDado4 = imgDado4.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
+		dado4 = new ImageIcon(imageDado4);
+
+		ImageIcon imgDado5 = new ImageIcon(Inicio.class.getResource("/caras_dado/dado 5.png"));
+		Image imageDado5 = imgDado5.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
+		dado5 = new ImageIcon(imageDado5);
+
+		ImageIcon imgDado6 = new ImageIcon(Inicio.class.getResource("/caras_dado/dado 6.png"));
+		Image imageDado6 = imgDado6.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
+		dado6 = new ImageIcon(imageDado6);
+
+		dado = new JLabel("");
+		dado.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(isCanceled){
+					TimerTask animTask = new TimerTask() {
+						@Override
+						public void run() {
+							for(int i=0; i<100; i++){
+								actualizarDado(game.lanzarDado());
+							}
+							tirada = game.lanzarDado();
+							actualizarDado(tirada);
+							isCanceled = false;
+						}
+					};
+					timer = new Timer();
+					timer.schedule(animTask,0,2*60*10000);
+				}
+			}
+		});
+		dado.setBounds(20, 10, 80, 80);
+		dado.setIcon(dado1);
+		panelDados.add(dado);
+		
+		/*----------------------------*\
+		|     Controlador del dado     |
+		\*----------------------------*/
+		contTimerTask = new TimerTask() {
+			@Override
+			public void run() {
+				if(!isCanceled){
+					timer.cancel();
+					isCanceled = true;
+					System.out.println(tirada);
+				}
+			}
+		};
+		controlador = new Timer();
+		controlador.schedule(contTimerTask, 0, 100);
+	}
+	/**
+	 * Actualiza visualmente el dado
+	 */
+	private void actualizarDado(int tirada){
+		try {
+			Thread.sleep(15);
+
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		switch(tirada){
+		case 1: dado.setIcon(dado1); break;
+		case 2: dado.setIcon(dado2); break;
+		case 3: dado.setIcon(dado3); break;
+		case 4: dado.setIcon(dado4); break;
+		case 5: dado.setIcon(dado5); break;
+		case 6: dado.setIcon(dado6); break;
+		}
+	}
+	/**
 	 * Coloca visualmente las casillas del tablero
 	 */
 	private void inicializarCasillas(){
@@ -416,7 +538,7 @@ public class Inicio extends JFrame {
 		casilla00.setIcon(game.getCasillas().get(0).getImagenP());
 		casilla00.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla00);
-		
+
 		casilla01 = new JLabel("");
 		casilla01.addMouseListener(new MouseAdapter() {
 			@Override
@@ -428,7 +550,7 @@ public class Inicio extends JFrame {
 		casilla01.setIcon(game.getCasillas().get(1).getImagenP());
 		casilla01.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla01);
-		
+
 		casilla02 = new JLabel("");
 		casilla02.addMouseListener(new MouseAdapter() {
 			@Override
@@ -440,7 +562,7 @@ public class Inicio extends JFrame {
 		casilla02.setIcon(game.getCasillas().get(2).getImagenP());
 		casilla02.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla02);
-		
+
 		casilla03 = new JLabel("");
 		casilla03.addMouseListener(new MouseAdapter() {
 			@Override
@@ -452,7 +574,7 @@ public class Inicio extends JFrame {
 		casilla03.setIcon(game.getCasillas().get(3).getImagenP());
 		casilla03.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla03);
-		
+
 		casilla04 = new JLabel("");
 		casilla04.addMouseListener(new MouseAdapter() {
 			@Override
@@ -464,7 +586,7 @@ public class Inicio extends JFrame {
 		casilla04.setIcon(game.getCasillas().get(4).getImagenP());
 		casilla04.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla04);
-		
+
 		casilla05 = new JLabel("");
 		casilla05.addMouseListener(new MouseAdapter() {
 			@Override
@@ -476,7 +598,7 @@ public class Inicio extends JFrame {
 		casilla05.setIcon(game.getCasillas().get(5).getImagenP());
 		casilla05.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla05);
-		
+
 		casilla06 = new JLabel("");
 		casilla06.addMouseListener(new MouseAdapter() {
 			@Override
@@ -488,7 +610,7 @@ public class Inicio extends JFrame {
 		casilla06.setIcon(game.getCasillas().get(6).getImagenP());
 		casilla06.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla06);
-		
+
 		casilla07 = new JLabel("");
 		casilla07.addMouseListener(new MouseAdapter() {
 			@Override
@@ -500,7 +622,7 @@ public class Inicio extends JFrame {
 		casilla07.setIcon(game.getCasillas().get(7).getImagenP());
 		casilla07.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla07);
-		
+
 		casilla08 = new JLabel("");
 		casilla08.addMouseListener(new MouseAdapter() {
 			@Override
@@ -512,7 +634,7 @@ public class Inicio extends JFrame {
 		casilla08.setIcon(game.getCasillas().get(8).getImagenP());
 		casilla08.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla08);
-		
+
 		casilla09 = new JLabel("");
 		casilla09.addMouseListener(new MouseAdapter() {
 			@Override
@@ -524,7 +646,7 @@ public class Inicio extends JFrame {
 		casilla09.setIcon(game.getCasillas().get(9).getImagenP());
 		casilla09.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla09);
-		
+
 		casilla10 = new JLabel("");
 		casilla10.addMouseListener(new MouseAdapter() {
 			@Override
@@ -536,7 +658,7 @@ public class Inicio extends JFrame {
 		casilla10.setIcon(game.getCasillas().get(10).getImagenP());
 		casilla10.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla10);
-		
+
 		casilla11 = new JLabel("");
 		casilla11.addMouseListener(new MouseAdapter() {
 			@Override
@@ -548,7 +670,7 @@ public class Inicio extends JFrame {
 		casilla11.setIcon(game.getCasillas().get(11).getImagenP());
 		casilla11.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla11);
-		
+
 		casilla12 = new JLabel("");
 		casilla12.addMouseListener(new MouseAdapter() {
 			@Override
@@ -560,7 +682,7 @@ public class Inicio extends JFrame {
 		casilla12.setIcon(game.getCasillas().get(12).getImagenP());
 		casilla12.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla12);
-		
+
 		casilla13 = new JLabel("");
 		casilla13.addMouseListener(new MouseAdapter() {
 			@Override
@@ -572,7 +694,7 @@ public class Inicio extends JFrame {
 		casilla13.setIcon(game.getCasillas().get(13).getImagenP());
 		casilla13.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla13);
-		
+
 		casilla14 = new JLabel("");
 		casilla14.addMouseListener(new MouseAdapter() {
 			@Override
@@ -584,7 +706,7 @@ public class Inicio extends JFrame {
 		casilla14.setIcon(game.getCasillas().get(14).getImagenP());
 		casilla14.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla14);
-		
+
 		casilla15 = new JLabel("");
 		casilla15.addMouseListener(new MouseAdapter() {
 			@Override
@@ -596,7 +718,7 @@ public class Inicio extends JFrame {
 		casilla15.setIcon(game.getCasillas().get(15).getImagenP());
 		casilla15.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla15);
-		
+
 		casilla16 = new JLabel("");
 		casilla16.addMouseListener(new MouseAdapter() {
 			@Override
@@ -608,7 +730,7 @@ public class Inicio extends JFrame {
 		casilla16.setIcon(game.getCasillas().get(16).getImagenP());
 		casilla16.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla16);
-		
+
 		casilla17 = new JLabel("");
 		casilla17.addMouseListener(new MouseAdapter() {
 			@Override
@@ -620,13 +742,13 @@ public class Inicio extends JFrame {
 		casilla17.setIcon(game.getCasillas().get(17).getImagenP());
 		casilla17.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla17);
-		
+
 		casilla18 = new JLabel("");
 		casilla18.setBounds(890, 320, 120, 90);
 		casilla18.setIcon(game.getCasillas().get(18).getImagenP());
 		casilla18.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla18);
-		
+
 		casilla19 = new JLabel("");
 		casilla19.addMouseListener(new MouseAdapter() {
 			@Override
@@ -638,7 +760,7 @@ public class Inicio extends JFrame {
 		casilla19.setIcon(game.getCasillas().get(19).getImagenP());
 		casilla19.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla19);
-		
+
 		casilla20 = new JLabel("");
 		casilla20.addMouseListener(new MouseAdapter() {
 			@Override
@@ -650,7 +772,7 @@ public class Inicio extends JFrame {
 		casilla20.setIcon(game.getCasillas().get(20).getImagenP());
 		casilla20.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla20);
-		
+
 		casilla21 = new JLabel("");
 		casilla21.addMouseListener(new MouseAdapter() {
 			@Override
@@ -662,7 +784,7 @@ public class Inicio extends JFrame {
 		casilla21.setIcon(game.getCasillas().get(21).getImagenP());
 		casilla21.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla21);
-		
+
 		casilla22 = new JLabel("");
 		casilla22.addMouseListener(new MouseAdapter() {
 			@Override
@@ -674,7 +796,7 @@ public class Inicio extends JFrame {
 		casilla22.setIcon(game.getCasillas().get(22).getImagenP());
 		casilla22.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla22);
-		
+
 		casilla23 = new JLabel("");
 		casilla23.addMouseListener(new MouseAdapter() {
 			@Override
@@ -686,13 +808,13 @@ public class Inicio extends JFrame {
 		casilla23.setIcon(game.getCasillas().get(23).getImagenP());
 		casilla23.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla23);
-		
+
 		casilla24 = new JLabel("");
 		casilla24.setBounds(290, 410, 120, 90);
 		casilla24.setIcon(game.getCasillas().get(24).getImagenP());
 		casilla24.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla24);
-		
+
 		casilla25 = new JLabel("");
 		casilla25.addMouseListener(new MouseAdapter() {
 			@Override
@@ -704,7 +826,7 @@ public class Inicio extends JFrame {
 		casilla25.setIcon(game.getCasillas().get(25).getImagenP());
 		casilla25.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla25);
-		
+
 		casilla26 = new JLabel("");
 		casilla26.addMouseListener(new MouseAdapter() {
 			@Override
@@ -716,7 +838,7 @@ public class Inicio extends JFrame {
 		casilla26.setIcon(game.getCasillas().get(26).getImagenP());
 		casilla26.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla26);
-		
+
 		casilla27 = new JLabel("");
 		casilla27.addMouseListener(new MouseAdapter() {
 			@Override
@@ -728,7 +850,7 @@ public class Inicio extends JFrame {
 		casilla27.setIcon(game.getCasillas().get(27).getImagenP());
 		casilla27.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla27);
-		
+
 		casilla28 = new JLabel("");
 		casilla28.addMouseListener(new MouseAdapter() {
 			@Override
@@ -740,7 +862,7 @@ public class Inicio extends JFrame {
 		casilla28.setIcon(game.getCasillas().get(28).getImagenP());
 		casilla28.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla28);
-		
+
 		casilla29 = new JLabel("");
 		casilla29.addMouseListener(new MouseAdapter() {
 			@Override
@@ -752,7 +874,7 @@ public class Inicio extends JFrame {
 		casilla29.setIcon(game.getCasillas().get(29).getImagenP());
 		casilla29.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla29);
-		
+
 		casilla30 = new JLabel("");
 		casilla30.addMouseListener(new MouseAdapter() {
 			@Override
@@ -764,7 +886,7 @@ public class Inicio extends JFrame {
 		casilla30.setIcon(game.getCasillas().get(30).getImagenP());
 		casilla30.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla30);
-		
+
 		casilla31 = new JLabel("");
 		casilla31.addMouseListener(new MouseAdapter() {
 			@Override
@@ -776,7 +898,7 @@ public class Inicio extends JFrame {
 		casilla31.setIcon(game.getCasillas().get(31).getImagenP());
 		casilla31.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla31);
-		
+
 		casilla32 = new JLabel("");
 		casilla32.addMouseListener(new MouseAdapter() {
 			@Override
@@ -788,7 +910,7 @@ public class Inicio extends JFrame {
 		casilla32.setIcon(game.getCasillas().get(32).getImagenP());
 		casilla32.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla32);
-		
+
 		casilla33 = new JLabel("");
 		casilla33.addMouseListener(new MouseAdapter() {
 			@Override
@@ -800,13 +922,13 @@ public class Inicio extends JFrame {
 		casilla33.setIcon(game.getCasillas().get(33).getImagenP());
 		casilla33.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla33);
-		
+
 		casilla34 = new JLabel("");
 		casilla34.setBounds(650, 140, 120, 90);
 		casilla34.setIcon(game.getCasillas().get(34).getImagenP());
 		casilla34.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla34);
-		
+
 		casilla35 = new JLabel("");
 		casilla35.addMouseListener(new MouseAdapter() {
 			@Override
@@ -818,7 +940,7 @@ public class Inicio extends JFrame {
 		casilla35.setIcon(game.getCasillas().get(35).getImagenP());
 		casilla35.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla35);
-		
+
 		casilla36 = new JLabel("");
 		casilla36.addMouseListener(new MouseAdapter() {
 			@Override
@@ -830,7 +952,7 @@ public class Inicio extends JFrame {
 		casilla36.setIcon(game.getCasillas().get(36).getImagenP());
 		casilla36.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla36);
-		
+
 		casilla37 = new JLabel("");
 		casilla37.addMouseListener(new MouseAdapter() {
 			@Override
@@ -842,13 +964,13 @@ public class Inicio extends JFrame {
 		casilla37.setIcon(game.getCasillas().get(37).getImagenP());
 		casilla37.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla37);
-		
+
 		casilla38 = new JLabel("");
 		casilla38.setBounds(290, 50, 120, 90);
 		casilla38.setIcon(game.getCasillas().get(38).getImagenP());
 		casilla38.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla38);
-		
+
 		casilla39 = new JLabel("");
 		casilla39.addMouseListener(new MouseAdapter() {
 			@Override
@@ -860,7 +982,7 @@ public class Inicio extends JFrame {
 		casilla39.setIcon(game.getCasillas().get(39).getImagenP());
 		casilla39.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla39);
-		
+
 		casilla40 = new JLabel("");
 		casilla40.addMouseListener(new MouseAdapter() {
 			@Override
@@ -872,37 +994,37 @@ public class Inicio extends JFrame {
 		casilla40.setIcon(game.getCasillas().get(40).getImagenP());
 		casilla40.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla40);
-		
+
 		ImageIcon imgEscalera = new ImageIcon(Inicio.class.getResource("/imagenes_casillas/escalera grande.png"));
 		Image escaleraArr = imgEscalera.getImage().getScaledInstance(90, 90, Image.SCALE_SMOOTH);
 		Icon iconEscalera = new ImageIcon(escaleraArr);
-		
+
 		ImageIcon imgPuente = new ImageIcon(Inicio.class.getResource("/imagenes_casillas/puente grande.png"));
 		Image puenteArr = imgPuente.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
 		Icon iconPuente = new ImageIcon(puenteArr);
-		
+
 		escalera01 = new JLabel("");
 		escalera01.setBounds(305, 500, 120, 90);
 		escalera01.setIcon(iconEscalera);
 		panelTablero.add(escalera01);
-		
+
 		escalera02 = new JLabel("");
 		escalera02.setBounds(305, 140, 120, 90);
 		escalera02.setIcon(iconEscalera);
 		panelTablero.add(escalera02);
-		
+
 		puente01 = new JLabel("");
 		puente01.setBounds(1010, 320, 120, 90);
 		puente01.setIcon(iconPuente);
 		panelTablero.add(puente01);
-		
+
 		puente02 = new JLabel("");
 		puente02.setBounds(770, 140, 120, 90);
 		puente02.setIcon(iconPuente);
 		panelTablero.add(puente02);
-		
+
 	}
-	
+
 	/**
 	 * Muestra la casilla en la que ha caido un jugador
 	 * @param pos - la posicion de la casilla
@@ -910,13 +1032,13 @@ public class Inicio extends JFrame {
 	private void mostrarCasilla(int pos){
 		contentPane.remove(panelTablero);
 		repaint();
-		
+
 		panelCasilla = new JPanel();
 		panelCasilla.setBackground(Color.WHITE);
 		panelCasilla.setBounds(1, 27, 1278, 692);
 		panelCasilla.setLayout(null);
 		contentPane.add(panelCasilla);
-		
+
 		casillaG = new JLabel("");
 		casillaG.addMouseListener(new MouseAdapter() {
 			@Override
@@ -935,7 +1057,7 @@ public class Inicio extends JFrame {
 		panelCasilla.add(casillaG);
 		casillaG.requestFocus();
 	}
-	
+
 	/**
 	 * Realiza la accion determinada de cada tecla
 	 * @param txtID el id del JTextField donde se presiono la tecla
@@ -958,13 +1080,14 @@ public class Inicio extends JFrame {
 					llamarPanelTablero(panelInicio);
 					game = new Juego(j1, j2);
 					inicializarCasillas();
+					inicializarZonaDados();
 				}
 				break;
 			}
 			break;
 		}
 	}
-	
+
 	/**
 	 * Muestra el panel del tablero una vez se hayan 
 	 * introducido los datos de los jugadores
@@ -973,7 +1096,7 @@ public class Inicio extends JFrame {
 		contentPane.remove(panel);
 		repaint();
 		contentPane.add(panelTablero);
-		
+
 	}
 
 	/**
