@@ -22,6 +22,7 @@ import java.awt.Font;
 import javax.swing.ImageIcon;
 import javax.swing.border.LineBorder;
 
+import util.Colores;
 import util.MyButtonModel;
 import util.Validaciones;
 
@@ -36,9 +37,13 @@ import java.util.TimerTask;
 import logica.Juego;
 import logica.Jugador;
 
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+
 public class Inicio extends JFrame {
 
 	private static final long serialVersionUID = 1L;
+	private Inicio este;
 
 	/*
 	 * Panel General
@@ -61,14 +66,19 @@ public class Inicio extends JFrame {
 	private JLabel lblJ2;
 	private JTextField txtJ1;
 	private JTextField txtJ2;
+	private JLabel colorJ1;
+	private JLabel colorJ2;
 	private JButton btnIniciar;
 	private JLabel lblCorazon;
 	private JLabel lblLabios;
 	private JLabel lblFuego;
 	private JLabel lblEmoji;
 	private String txt;
-	private Jugador j1;
-	private Jugador j2;
+	/*
+	 * Panel para cambiar color de jugador
+	 */
+	private JPanel panelColor;
+	private boolean panelColorVisible = false;
 	/*
 	 * Panel donde se mostrara el tablero
 	 */
@@ -147,8 +157,24 @@ public class Inicio extends JFrame {
 	 */
 	private TimerTask contTimerTask;
 	private Timer controlador;
+	/*
+	 * Fichas
+	 */
+	private JLabel fichaJ1;
+	private JLabel fichaJ2;
+	/*
+	 * Para controlar animacion de movimiento de ficha
+	 */
+	private TimerTask animMover;
+	private TimerTask contFichasTT;
+	private Timer contFichas;
+	private boolean moviendoFicha = false;
 
+	private boolean terminarJuego = false;
 	private Juego game;
+	private Jugador j1;
+	private Jugador j2;
+	private Jugador jugadorActual;
 
 
 
@@ -166,7 +192,9 @@ public class Inicio extends JFrame {
 	}
 
 	public Inicio() {
-
+		
+		este = this;
+		
 		/*-----------------------------------*\
 		|     Panel General Con Sus Datos     |
 		\*-----------------------------------*/
@@ -201,6 +229,8 @@ public class Inicio extends JFrame {
 			public void mousePressed(MouseEvent e) {
 				xMouse = e.getX();
 				yMouse = e.getY();
+				if(panelColorVisible)
+					cerrarPanelColor();
 			}
 		});
 		panelSuperior.setBackground(new Color(200, 0, 0));
@@ -270,6 +300,13 @@ public class Inicio extends JFrame {
 		|     Panel Inicio para introducir los datos de los jugadores     |
 		\*---------------------------------------------------------------*/
 		panelInicio = new JPanel();
+		panelInicio.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(panelColorVisible)
+					cerrarPanelColor();
+			}
+		});
 		panelInicio.setBackground(Color.WHITE);
 		panelInicio.setBounds(1, 27, 1278, 692);
 		panelInicio.setLayout(null);
@@ -293,13 +330,20 @@ public class Inicio extends JFrame {
 		panelInicio.add(lblTitulo);
 
 		txtJ1 = new JTextField();
+		txtJ1.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				if(panelColorVisible)
+					cerrarPanelColor();
+			}
+		});
 		txtJ1.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
 				realizarAccion(1, e.getKeyCode());
 				txt = txtJ1.getText();
 				if(Validaciones.jugador(txt)){
-					j1 = new Jugador(txt);
+					j1 = new Jugador(txt, colorJ1.getBackground());
 					actualizarBoton();
 				}
 				else{
@@ -325,13 +369,20 @@ public class Inicio extends JFrame {
 		panelInicio.add(txtJ1);
 
 		txtJ2 = new JTextField();
+		txtJ2.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				if(panelColorVisible)
+					cerrarPanelColor();
+			}
+		});
 		txtJ2.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
 				realizarAccion(2, e.getKeyCode());
 				txt = txtJ2.getText();
 				if(Validaciones.jugador(txt)){
-					j2 = new Jugador(txt);
+					j2 = new Jugador(txt, colorJ2.getBackground());
 					actualizarBoton();
 				}
 				else{
@@ -356,11 +407,45 @@ public class Inicio extends JFrame {
 		txtJ2.setBounds(400, 430, 480, 50);
 		panelInicio.add(txtJ2);
 
+		colorJ1 = new JLabel("");
+		colorJ1.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(panelColorVisible)
+					cerrarPanelColor();
+				llamarPanelCambiarColor(colorJ1);
+				panelColorVisible = true;
+			}
+		});
+		colorJ1.setOpaque(true);
+		colorJ1.setBackground(new Color(255, 0, 0));
+		colorJ1.setBorder(new LineBorder(new Color(80, 80, 80), 2));
+		colorJ1.setBounds(900, 270, 50, 50);
+		panelInicio.add(colorJ1);
+
+		colorJ2 = new JLabel("");
+		colorJ2.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(panelColorVisible)
+					cerrarPanelColor();
+				llamarPanelCambiarColor(colorJ2);
+				panelColorVisible = true;
+			}
+		});
+		colorJ2.setOpaque(true);
+		colorJ2.setBackground(new Color(0, 112, 192));
+		colorJ2.setBorder(new LineBorder(new Color(80, 80, 80), 2));
+		colorJ2.setBounds(900, 430, 50, 50);
+		panelInicio.add(colorJ2);
+
 		btnIniciar = new JButton("Jugar");
 		btnIniciar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				llamarPanelTablero(panelInicio);
 				game = new Juego(j1, j2);
+				jugadorActual = j1;
+				colocarFichas();
 				inicializarCasillas();
 				inicializarZonaDados();
 			}
@@ -394,7 +479,7 @@ public class Inicio extends JFrame {
 
 		lblLabios = new JLabel("");
 		lblLabios.setIcon(new ImageIcon(Inicio.class.getResource("/imagenes/labios 96.png")));
-		lblLabios.setBounds(987, 474, 96, 96);
+		lblLabios.setBounds(987, 500, 96, 96);
 		panelInicio.add(lblLabios);
 
 		lblFuego = new JLabel("");
@@ -404,7 +489,7 @@ public class Inicio extends JFrame {
 
 		lblEmoji = new JLabel("");
 		lblEmoji.setIcon(new ImageIcon(Inicio.class.getResource("/imagenes/emoji enamorado 96.png")));
-		lblEmoji.setBounds(1091, 270, 98, 98);
+		lblEmoji.setBounds(1110, 270, 98, 98);
 		panelInicio.add(lblEmoji);
 
 
@@ -423,10 +508,891 @@ public class Inicio extends JFrame {
 		panelDados.setLayout(null);
 		panelTablero.add(panelDados);
 
-		
-		
+
 	}
 
+	/**
+	 * Coloca las fichas
+	 */
+	private void colocarFichas(){
+		ImageIcon imgFicha1 = null;
+		Image imageFicha1 = null;
+		Icon iconFich1 = null;
+		ImageIcon imgFicha2 = null;
+		Image imageFicha2 = null;
+		Icon iconFich2 = null;
+		int colJ1 = Colores.numeroColor(j1.getColor());
+		int colJ2 = Colores.numeroColor(j2.getColor());
+
+		switch(colJ1){
+		case 1:
+			imgFicha1 = new ImageIcon(Inicio.class.getResource("/fichas/ficha roja.png"));
+			imageFicha1 = imgFicha1.getImage().getScaledInstance(34, 50, Image.SCALE_SMOOTH);
+			break;
+		case 2:
+			imgFicha1 = new ImageIcon(Inicio.class.getResource("/fichas/ficha naranja.png"));
+			imageFicha1 = imgFicha1.getImage().getScaledInstance(34, 50, Image.SCALE_SMOOTH);
+			break;
+		case 3:
+			imgFicha1 = new ImageIcon(Inicio.class.getResource("/fichas/ficha amarilla.png"));
+			imageFicha1 = imgFicha1.getImage().getScaledInstance(34, 50, Image.SCALE_SMOOTH);
+			break;
+		case 4:
+			imgFicha1 = new ImageIcon(Inicio.class.getResource("/fichas/ficha verde.png"));
+			imageFicha1 = imgFicha1.getImage().getScaledInstance(34, 50, Image.SCALE_SMOOTH);
+			break;
+		case 5:
+			imgFicha1 = new ImageIcon(Inicio.class.getResource("/fichas/ficha azul.png"));
+			imageFicha1 = imgFicha1.getImage().getScaledInstance(34, 50, Image.SCALE_SMOOTH);
+			break;
+		case 6:
+			imgFicha1 = new ImageIcon(Inicio.class.getResource("/fichas/ficha morada.png"));
+			imageFicha1 = imgFicha1.getImage().getScaledInstance(34, 50, Image.SCALE_SMOOTH);
+			break;
+		case 7:
+			imgFicha1 = new ImageIcon(Inicio.class.getResource("/fichas/ficha rosa.png"));
+			imageFicha1 = imgFicha1.getImage().getScaledInstance(34, 50, Image.SCALE_SMOOTH);
+			break;
+		case 8:
+			imgFicha1 = new ImageIcon(Inicio.class.getResource("/fichas/ficha gris.png"));
+			imageFicha1 = imgFicha1.getImage().getScaledInstance(34, 50, Image.SCALE_SMOOTH);
+			break;
+		}
+
+		switch(colJ2){
+		case 1:
+			imgFicha2 = new ImageIcon(Inicio.class.getResource("/fichas/ficha roja.png"));
+			imageFicha2 = imgFicha2.getImage().getScaledInstance(34, 50, Image.SCALE_SMOOTH);
+			break;
+		case 2:
+			imgFicha2 = new ImageIcon(Inicio.class.getResource("/fichas/ficha naranja.png"));
+			imageFicha2 = imgFicha2.getImage().getScaledInstance(34, 50, Image.SCALE_SMOOTH);
+			break;
+		case 3:
+			imgFicha2 = new ImageIcon(Inicio.class.getResource("/fichas/ficha amarilla.png"));
+			imageFicha2 = imgFicha2.getImage().getScaledInstance(34, 50, Image.SCALE_SMOOTH);
+			break;
+		case 4:
+			imgFicha2 = new ImageIcon(Inicio.class.getResource("/fichas/ficha verde.png"));
+			imageFicha2 = imgFicha2.getImage().getScaledInstance(34, 50, Image.SCALE_SMOOTH);
+			break;
+		case 5:
+			imgFicha2 = new ImageIcon(Inicio.class.getResource("/fichas/ficha azul.png"));
+			imageFicha2 = imgFicha2.getImage().getScaledInstance(34, 50, Image.SCALE_SMOOTH);
+			break;
+		case 6:
+			imgFicha2 = new ImageIcon(Inicio.class.getResource("/fichas/ficha morada.png"));
+			imageFicha2 = imgFicha2.getImage().getScaledInstance(34, 50, Image.SCALE_SMOOTH);
+			break;
+		case 7:
+			imgFicha2 = new ImageIcon(Inicio.class.getResource("/fichas/ficha rosa.png"));
+			imageFicha2 = imgFicha2.getImage().getScaledInstance(34, 50, Image.SCALE_SMOOTH);
+			break;
+		case 8:
+			imgFicha2 = new ImageIcon(Inicio.class.getResource("/fichas/ficha gris.png"));
+			imageFicha2 = imgFicha2.getImage().getScaledInstance(34, 50, Image.SCALE_SMOOTH);
+			break;
+		}
+
+		iconFich1 = new ImageIcon(imageFicha1);
+		iconFich2 = new ImageIcon(imageFicha2);
+
+		int cx1 = (int)game.getCasillas().get(0).getpJ1().getX();
+		int cy1 = (int)game.getCasillas().get(0).getpJ1().getY();
+		int cx2 = (int)game.getCasillas().get(0).getpJ2().getX();
+		int cy2 = (int)game.getCasillas().get(0).getpJ2().getY();
+
+		fichaJ1 = new JLabel("");
+		fichaJ1.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				System.out.println(j1.getPosicion());
+			}
+		});
+		fichaJ1.setBounds(cx1, cy1, 34, 50);
+		fichaJ1.setIcon(iconFich1);
+		panelTablero.add(fichaJ1);
+
+		fichaJ2 = new JLabel("");
+		fichaJ2.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				System.out.println(j2.getPosicion());
+			}
+		});
+		fichaJ2.setBounds(cx2, cy2, 34, 50);
+		fichaJ2.setIcon(iconFich2);
+		panelTablero.add(fichaJ2);
+
+		contFichasTT = new TimerTask() {
+			@Override
+			public void run() {
+				if(moviendoFicha){
+					timer.cancel();
+					moviendoFicha = false;
+				}
+			}
+		};
+		contFichas = new Timer();
+		contFichas.schedule(contFichasTT, 0, 1000); 
+	}
+
+	/**
+	 * Mueve la ficha del jugador en dependencia de su tirada
+	 * @param j el jugador en turno
+	 * @param tirada la tirada del jugador
+	 */
+	private void mover(Jugador j, int tirada){
+		if(j.equals(j1)){
+			if(j1.getPosicion() + tirada <= 40){
+				for(int i=0; i<tirada; i++){
+					int pos = j1.getPosicion();
+					dormir(1);
+					avanzarFicha(fichaJ1, 1, pos, pos+1);
+					j1.setPosicion(pos+1);
+				}
+				dormir(1);
+				if(j1.getPosicion() == 18){
+					dormir(1);
+					cruzar(fichaJ1, 1, j1.getPosicion());
+					j1.setPosicion(12);
+					dormirLargo();
+					mostrarCasilla(j1.getPosicion());
+				}
+				else if(j1.getPosicion() == 34){
+					dormir(1);
+					cruzar(fichaJ1, 1, j1.getPosicion());
+					j1.setPosicion(16);
+					dormirLargo();
+					mostrarCasilla(j1.getPosicion());
+				}
+				else if(j1.getPosicion() == 24){
+					dormir(1);
+					bajar(fichaJ1, 1, j1.getPosicion());
+					j1.setPosicion(2);
+					dormirLargo();
+					mostrarCasilla(j1.getPosicion());
+				}
+				else if(j1.getPosicion() == 38){
+					dormir(1);
+					bajar(fichaJ1, 1, j1.getPosicion());
+					j1.setPosicion(30);
+					dormirLargo();
+					mostrarCasilla(j1.getPosicion());
+				}
+				else if(j1.getPosicion() == 40){
+					terminarJuego = true;
+					mostrarCasilla(40);
+				}
+				else
+					mostrarCasilla(j1.getPosicion());
+				cambiarTurno();
+			}
+			else{
+				for(int i=0; i<tirada; i++){
+					int pos = j1.getPosicion();
+					dormir(1);
+					retrocederFicha(fichaJ1, 1, pos, pos-1);
+					j1.setPosicion(pos-1);
+				}
+				dormir(1);
+				if(j1.getPosicion() == 38){
+					dormir(1);
+					bajar(fichaJ1, 1, j1.getPosicion());
+					j1.setPosicion(30);
+					dormirLargo();
+					mostrarCasilla(j1.getPosicion());
+				}
+				else if(j1.getPosicion() == 34){
+					dormir(1);
+					cruzar(fichaJ1, 1, j1.getPosicion());
+					j1.setPosicion(16);
+					dormirLargo();
+					mostrarCasilla(j1.getPosicion());
+				}
+				else
+					mostrarCasilla(j1.getPosicion());
+				cambiarTurno();
+			}
+		}
+		else{
+			if(j2.getPosicion() + tirada <= 40){
+				for(int i=0; i<tirada; i++){
+					int pos = j2.getPosicion();
+					dormir(1);
+					avanzarFicha(fichaJ2, 2, pos, pos+1);
+					j2.setPosicion(pos+1);
+				}
+				dormir(1);
+				if(j2.getPosicion() == 18){
+					dormir(1);
+					cruzar(fichaJ2, 2, j2.getPosicion());
+					j2.setPosicion(12);
+					dormirLargo();
+					mostrarCasilla(j2.getPosicion());
+				}
+				else if(j2.getPosicion() == 34){
+					dormir(1);
+					cruzar(fichaJ2, 2, j2.getPosicion());
+					j2.setPosicion(16);
+					dormirLargo();
+					mostrarCasilla(j2.getPosicion());
+				}
+				else if(j2.getPosicion() == 24){
+					dormir(1);
+					bajar(fichaJ2, 2, j2.getPosicion());
+					j2.setPosicion(2);
+					dormirLargo();
+					mostrarCasilla(j2.getPosicion());
+				}
+				else if(j2.getPosicion() == 38){
+					dormir(1);
+					bajar(fichaJ2, 2, j2.getPosicion());
+					j2.setPosicion(30);
+					dormirLargo();
+					mostrarCasilla(j2.getPosicion());
+				}
+				else if(j2.getPosicion() == 40){
+					terminarJuego = true;
+					mostrarCasilla(40);
+				}
+				else
+					mostrarCasilla(j2.getPosicion());
+				cambiarTurno();
+			}
+			else{
+				for(int i=0; i<tirada; i++){
+					int pos = j2.getPosicion();
+					dormir(1);
+					retrocederFicha(fichaJ2, 2, pos, pos-1);
+					j2.setPosicion(pos-1);
+				}
+				dormir(1);
+				if(j2.getPosicion() == 38){
+					dormir(1);
+					bajar(fichaJ2, 2, j2.getPosicion());
+					j2.setPosicion(30);
+					dormirLargo();
+					mostrarCasilla(j2.getPosicion());
+				}
+				else if(j2.getPosicion() == 34){
+					dormir(1);
+					cruzar(fichaJ2, 2, j2.getPosicion());
+					j2.setPosicion(16);
+					dormirLargo();
+					mostrarCasilla(j2.getPosicion());
+				}
+				else
+					mostrarCasilla(j2.getPosicion());
+				cambiarTurno();
+			}
+		}
+	}
+
+	/**
+	 * Cambia de turno
+	 */
+	private void cambiarTurno(){
+		if(jugadorActual.equals(j1)){
+			jugadorActual = j2;
+			nombreJugador.setText(j2.getNick());
+			nombreJugador.setForeground(j2.getColor());
+		}
+		else{
+			jugadorActual = j1;
+			nombreJugador.setText(j1.getNick());
+			nombreJugador.setForeground(j1.getColor());
+		}
+	}
+
+	/**
+	 * Hace que una ficha avance en el tablero
+	 * @param fich la ficha del jugador
+	 * @param numeroJugador el numero del jugador
+	 * @param inicio casilla de inicio
+	 * @param destino casilla de destino
+	 */
+	private void avanzarFicha(JLabel fich, int numeroJugador, int inicio, final int destino){
+		final JLabel ficha = fich;
+		switch(numeroJugador){
+		case 1:
+			if((inicio >= 0 && inicio <= 8) || (inicio >= 28 && inicio <= 32)){
+				moviendoFicha = true;
+				animMover = new TimerTask() {
+					@Override
+					public void run() {
+						while(!game.getCasillas().get(destino).getpJ1().equals(ficha.getLocation())){
+							int x = ficha.getX();
+							int y = ficha.getY();
+							moverPaso(ficha, ++x, y);
+						}
+					}
+				};
+				timer = new Timer();
+				timer.schedule(animMover,0,2*60*10000);
+			}
+			else if((inicio >= 9 && inicio <= 13) || (inicio >= 26 && inicio <= 27) || (inicio >= 33 && inicio <= 34)){
+				moviendoFicha = true;
+				animMover = new TimerTask() {
+					@Override
+					public void run() {
+						while(!game.getCasillas().get(destino).getpJ1().equals(ficha.getLocation())){
+							int x = ficha.getX();
+							int y = ficha.getY();
+							moverPaso(ficha, x, --y);
+						}
+					}
+				};
+				timer = new Timer();
+				timer.schedule(animMover,0,2*60*10000);
+			}
+			else if((inicio >= 14 && inicio <= 15) || (inicio >= 19 && inicio <= 25) || (inicio >= 35 && inicio <= 39)){
+				moviendoFicha = true;
+				animMover = new TimerTask() {
+					@Override
+					public void run() {
+						while(!game.getCasillas().get(destino).getpJ1().equals(ficha.getLocation())){
+							int x = ficha.getX();
+							int y = ficha.getY();
+							moverPaso(ficha, --x, y);
+						}
+					}
+				};
+				timer = new Timer();
+				timer.schedule(animMover,0,2*60*10000);
+			}
+			else if(inicio >= 16 && inicio <= 18){
+				moviendoFicha = true;
+				animMover = new TimerTask() {
+					@Override
+					public void run() {
+						while(!game.getCasillas().get(destino).getpJ1().equals(ficha.getLocation())){
+							int x = ficha.getX();
+							int y = ficha.getY();
+							moverPaso(ficha, x, ++y);
+						}
+					}
+				};
+				timer = new Timer();
+				timer.schedule(animMover,0,2*60*10000);
+			}
+			break;
+
+		case 2:
+			if((inicio >= 0 && inicio <= 8) || (inicio >= 28 && inicio <= 32)){
+				moviendoFicha = true;
+				animMover = new TimerTask() {
+					@Override
+					public void run() {
+						while(!game.getCasillas().get(destino).getpJ2().equals(ficha.getLocation())){
+							int x = ficha.getX();
+							int y = ficha.getY();
+							moverPaso(ficha, ++x, y);
+						}
+					}
+				};
+				timer = new Timer();
+				timer.schedule(animMover,0,2*60*10000);
+			}
+			else if((inicio >= 9 && inicio <= 13) || (inicio >= 26 && inicio <= 27) || (inicio >= 33 && inicio <= 34)){
+				moviendoFicha = true;
+				animMover = new TimerTask() {
+					@Override
+					public void run() {
+						while(!game.getCasillas().get(destino).getpJ2().equals(ficha.getLocation())){
+							int x = ficha.getX();
+							int y = ficha.getY();
+							moverPaso(ficha, x, --y);
+						}
+					}
+				};
+				timer = new Timer();
+				timer.schedule(animMover,0,2*60*10000);
+			}
+			else if((inicio >= 14 && inicio <= 15) || (inicio >= 19 && inicio <= 25) || (inicio >= 35 && inicio <= 39)){
+				moviendoFicha = true;
+				animMover = new TimerTask() {
+					@Override
+					public void run() {
+						while(!game.getCasillas().get(destino).getpJ2().equals(ficha.getLocation())){
+							int x = ficha.getX();
+							int y = ficha.getY();
+							moverPaso(ficha, --x, y);
+						}
+					}
+				};
+				timer = new Timer();
+				timer.schedule(animMover,0,2*60*10000);
+			}
+			else if(inicio >= 16 && inicio <= 18){
+				moviendoFicha = true;
+				animMover = new TimerTask() {
+					@Override
+					public void run() {
+						while(!game.getCasillas().get(destino).getpJ2().equals(ficha.getLocation())){
+							int x = ficha.getX();
+							int y = ficha.getY();
+							moverPaso(ficha, x, ++y);
+						}
+					}
+				};
+				timer = new Timer();
+				timer.schedule(animMover,0,2*60*10000);
+			}
+			break;
+		}
+	}
+	/**
+	 * Hace que una ficha retroceda en el tablero
+	 * @param fich la ficha a mover
+	 * @param numeroJugador el numero del jugador
+	 * @param inicio la casilla de inicio
+	 * @param destino la casilla de destino
+	 */
+	private void retrocederFicha(JLabel fich, int numeroJugador, int inicio, final int destino){
+		final JLabel ficha = fich;
+		switch(numeroJugador){
+		case 1:
+			if(inicio >= 36 && inicio <= 39){
+				moviendoFicha = true;
+				animMover = new TimerTask() {
+					@Override
+					public void run() {
+						while(!game.getCasillas().get(destino).getpJ1().equals(ficha.getLocation())){
+							int x = ficha.getX();
+							int y = ficha.getY();
+							moverPaso(ficha, ++x, y);
+						}
+					}
+				};
+				timer = new Timer();
+				timer.schedule(animMover,0,2*60*10000);
+			}
+			else if(inicio >= 34 && inicio <= 35){
+				moviendoFicha = true;
+				animMover = new TimerTask() {
+					@Override
+					public void run() {
+						while(!game.getCasillas().get(destino).getpJ1().equals(ficha.getLocation())){
+							int x = ficha.getX();
+							int y = ficha.getY();
+							moverPaso(ficha, x, ++y);
+						}
+					}
+				};
+				timer = new Timer();
+				timer.schedule(animMover,0,2*60*10000);
+			}
+			else if(inicio >= 29 && inicio <= 33){
+				moviendoFicha = true;
+				animMover = new TimerTask() {
+					@Override
+					public void run() {
+						while(!game.getCasillas().get(destino).getpJ1().equals(ficha.getLocation())){
+							int x = ficha.getX();
+							int y = ficha.getY();
+							moverPaso(ficha, --x, y);
+						}
+					}
+				};
+				timer = new Timer();
+				timer.schedule(animMover,0,2*60*10000);
+			}
+			break;
+		case 2:
+			if(inicio >= 36 && inicio <= 39){
+				moviendoFicha = true;
+				animMover = new TimerTask() {
+					@Override
+					public void run() {
+						while(!game.getCasillas().get(destino).getpJ2().equals(ficha.getLocation())){
+							int x = ficha.getX();
+							int y = ficha.getY();
+							moverPaso(ficha, ++x, y);
+						}
+					}
+				};
+				timer = new Timer();
+				timer.schedule(animMover,0,2*60*10000);
+			}
+			else if(inicio >= 34 && inicio <= 35){
+				moviendoFicha = true;
+				animMover = new TimerTask() {
+					@Override
+					public void run() {
+						while(!game.getCasillas().get(destino).getpJ2().equals(ficha.getLocation())){
+							int x = ficha.getX();
+							int y = ficha.getY();
+							moverPaso(ficha, x, ++y);
+						}
+					}
+				};
+				timer = new Timer();
+				timer.schedule(animMover,0,2*60*10000);
+			}
+			else if(inicio >= 29 && inicio <= 33){
+				moviendoFicha = true;
+				animMover = new TimerTask() {
+					@Override
+					public void run() {
+						while(!game.getCasillas().get(destino).getpJ2().equals(ficha.getLocation())){
+							int x = ficha.getX();
+							int y = ficha.getY();
+							moverPaso(ficha, --x, y);
+						}
+					}
+				};
+				timer = new Timer();
+				timer.schedule(animMover,0,2*60*10000);
+			}
+			break;
+		}
+
+	}
+	/**
+	 * Mueve la ficha a la posicion indicada
+	 * @param ficha ficha a mover
+	 * @param x coordenada X
+	 * @param y coordenada Y
+	 */
+	private void moverPaso(JLabel ficha, int x, int y){
+		try {
+			Thread.sleep(1);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		ficha.setLocation(x, y);
+	}
+	/**
+	 * Mueve la ficha a la posicion indicada de forma mas lenta
+	 *  @param ficha ficha a mover
+	 * @param x coordenada X
+	 * @param y coordenada Y
+	 */
+	private void moverPasoLento(JLabel ficha, int x, int y){
+		try {
+			Thread.sleep(5);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		ficha.setLocation(x, y);
+	}
+	/**
+	 * Mueve la ficha a traves de un puente
+	 * @param fich la ficha a mover
+	 * @param numeroJugador el numero del juador
+	 * @param pos la posicion de la casilla a la q cruzara
+	 */
+	private void cruzar(JLabel fich, int numeroJugador, final int pos){
+		final JLabel ficha = fich;
+		switch(numeroJugador){
+		case 1:
+			moviendoFicha = true;
+			animMover = new TimerTask() {
+				@Override
+				public void run() {
+					int salto;
+					if(pos == 18)
+						salto = 12;
+					else
+						salto = 16;
+					while(!game.getCasillas().get(salto).getpJ1().equals(ficha.getLocation())){
+						int x = ficha.getX();
+						int y = ficha.getY();
+						moverPasoLento(ficha, ++x, y);
+					}
+				}
+			};
+			timer = new Timer();
+			timer.schedule(animMover,0,2*60*10000);
+			break;
+		case 2:
+			moviendoFicha = true;
+			animMover = new TimerTask() {
+				@Override
+				public void run() {
+					int salto;
+					if(pos == 18)
+						salto = 12;
+					else
+						salto = 16;
+					while(!game.getCasillas().get(salto).getpJ2().equals(ficha.getLocation())){
+						int x = ficha.getX();
+						int y = ficha.getY();
+						moverPasoLento(ficha, ++x, y);
+					}
+				}
+			};
+			timer = new Timer();
+			timer.schedule(animMover,0,2*60*10000);
+			break;
+		}
+	}
+	/**
+	 * Mueve la ficha a traves de una escalera
+	 * @param fich la ficha a mover
+	 * @param numeroJugador el numero del juador
+	 * @param pos la posicion de la casilla a la q cruzara
+	 */
+	private void bajar(JLabel fich, int numeroJugador, final int pos){
+		final JLabel ficha = fich;
+		switch(numeroJugador){
+		case 1:
+			moviendoFicha = true;
+			animMover = new TimerTask() {
+				@Override
+				public void run() {
+					int salto;
+					if(pos == 24)
+						salto = 2;
+					else
+						salto = 30;
+					while(!game.getCasillas().get(salto).getpJ1().equals(ficha.getLocation())){
+						int x = ficha.getX();
+						int y = ficha.getY();
+						moverPasoLento(ficha, x, ++y);
+					}
+				}
+			};
+			timer = new Timer();
+			timer.schedule(animMover,0,2*60*10000);
+			break;
+		case 2:
+			moviendoFicha = true;
+			animMover = new TimerTask() {
+				@Override
+				public void run() {
+					int salto;
+					if(pos == 24)
+						salto = 2;
+					else
+						salto = 30;
+					while(!game.getCasillas().get(salto).getpJ2().equals(ficha.getLocation())){
+						int x = ficha.getX();
+						int y = ficha.getY();
+						moverPasoLento(ficha, x, ++y);
+					}
+				}
+			};
+			timer = new Timer();
+			timer.schedule(animMover,0,2*60*10000);
+			break;
+		}
+	}
+	/**
+	 * duerme un periodo corto
+	 * @param i
+	 */
+	private void dormir(int i){
+		if(i != 0){
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	/**
+	 * Duerme un periodo largo
+	 */
+	private void dormirLargo(){
+		try {
+			Thread.sleep(1500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * Llama al panel para cambiar el color del jugador
+	 */
+	private void llamarPanelCambiarColor(final JLabel p){
+		panelColor = new JPanel();
+		panelColor.setBackground(Color.white);
+		panelColor.setBorder(new LineBorder(Color.gray, 2));
+		panelColor.setBounds(950, p.getY(), 145, 75);
+
+		final JLabel rojo = new JLabel("");
+		rojo.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				p.setBackground(rojo.getBackground());
+				if(p.equals(colorJ1)){
+					if(j1 != null)
+						j1.setColor(rojo.getBackground());
+				}
+				else{
+					if(j2 != null)
+						j2.setColor(rojo.getBackground());
+				}
+				cerrarPanelColor();
+			}
+		});
+		rojo.setOpaque(true);
+		rojo.setBackground(Colores.C_ROJO);
+		rojo.setBounds(5, 5, 30, 30);
+		panelColor.add(rojo);
+
+		final JLabel naranja = new JLabel("");
+		naranja.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				p.setBackground(naranja.getBackground());
+				if(p.equals(colorJ1)){
+					if(j1 != null)
+						j1.setColor(naranja.getBackground());
+				}
+				else{
+					if(j2 != null)
+						j2.setColor(naranja.getBackground());
+				}
+				cerrarPanelColor();
+			}
+		});
+		naranja.setOpaque(true);
+		naranja.setBackground(Colores.C_NARANJA);
+		naranja.setBounds(40, 5, 30, 30);
+		panelColor.add(naranja);
+
+		final JLabel amarillo = new JLabel("");
+		amarillo.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				p.setBackground(amarillo.getBackground());
+				if(p.equals(colorJ1)){
+					if(j1 != null)
+						j1.setColor(amarillo.getBackground());
+				}
+				else{
+					if(j2 != null)
+						j2.setColor(amarillo.getBackground());
+				}
+				cerrarPanelColor();
+			}
+		});
+		amarillo.setOpaque(true);
+		amarillo.setBackground(Colores.C_AMARILLO);
+		amarillo.setBounds(75, 5, 30, 30);
+		panelColor.add(amarillo);
+
+		final JLabel verde = new JLabel("");
+		verde.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				p.setBackground(verde.getBackground());
+				if(p.equals(colorJ1)){
+					if(j1 != null)
+						j1.setColor(verde.getBackground());
+				}
+				else{
+					if(j2 != null)
+						j2.setColor(verde.getBackground());
+				}
+				cerrarPanelColor();
+			}
+		});
+		verde.setOpaque(true);
+		verde.setBackground(Colores.C_VERDE);
+		verde.setBounds(110, 5, 30, 30);
+		panelColor.add(verde);
+
+		final JLabel azul = new JLabel("");
+		azul.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				p.setBackground(azul.getBackground());
+				if(p.equals(colorJ1)){
+					if(j1 != null)
+						j1.setColor(azul.getBackground());
+				}
+				else{
+					if(j2 != null)
+						j2.setColor(azul.getBackground());
+				}
+				cerrarPanelColor();
+			}
+		});
+		azul.setOpaque(true);
+		azul.setBackground(Colores.C_AZUL);
+		azul.setBounds(5, 40, 30, 30);
+		panelColor.add(azul);
+
+		final JLabel morado = new JLabel("");
+		morado.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				p.setBackground(morado.getBackground());
+				if(p.equals(colorJ1)){
+					if(j1 != null)
+						j1.setColor(morado.getBackground());
+				}
+				else{
+					if(j2 != null)
+						j2.setColor(morado.getBackground());
+				}
+				cerrarPanelColor();
+			}
+		});
+		morado.setOpaque(true);
+		morado.setBackground(Colores.C_MORADO);
+		morado.setBounds(40, 40, 30, 30);
+		panelColor.add(morado);
+
+		final JLabel rosa = new JLabel("");
+		rosa.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				p.setBackground(rosa.getBackground());
+				if(p.equals(colorJ1)){
+					if(j1 != null)
+						j1.setColor(rosa.getBackground());
+				}
+				else{
+					if(j2 != null)
+						j2.setColor(rosa.getBackground());
+				}
+				cerrarPanelColor();
+			}
+		});
+		rosa.setOpaque(true);
+		rosa.setBackground(Colores.C_ROSA);
+		rosa.setBounds(75, 40, 30, 30);
+		panelColor.add(rosa);
+
+		final JLabel gris = new JLabel("");
+		gris.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				p.setBackground(gris.getBackground());
+				if(p.equals(colorJ1)){
+					if(j1 != null)
+						j1.setColor(gris.getBackground());
+				}
+				else{
+					if(j2 != null)
+						j2.setColor(gris.getBackground());
+				}
+				cerrarPanelColor();
+			}
+		});
+		gris.setOpaque(true);
+		gris.setBackground(Colores.C_GRIS);
+		gris.setBounds(110, 40, 30, 30);
+		panelColor.add(gris);
+
+		panelInicio.add(panelColor);
+		panelInicio.repaint();
+	}
+	/**
+	 * Cierra el panel de cambiar el color del jugador
+	 */
+	private void cerrarPanelColor(){
+		panelInicio.remove(panelColor);
+		repaint();
+		actualizarBoton();
+		panelColorVisible = false;
+	}
 	/**
 	 * Inicializa y coloca lo relacionado al dado
 	 */
@@ -434,7 +1400,7 @@ public class Inicio extends JFrame {
 		nombreJugador = new JLabel(j1.getNick());
 		nombreJugador.setHorizontalAlignment(SwingConstants.CENTER);
 		nombreJugador.setFont(new Font("DomBold BT", Font.BOLD, 50));
-		nombreJugador.setForeground(Color.black);
+		nombreJugador.setForeground(j1.getColor());
 		nombreJugador.setBounds(890, 20, 230, 60);
 		panelTablero.add(nombreJugador);
 
@@ -473,7 +1439,8 @@ public class Inicio extends JFrame {
 		dado.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if(isCanceled){
+				if(isCanceled && !moviendoFicha){
+					isCanceled = false;
 					TimerTask animTask = new TimerTask() {
 						@Override
 						public void run() {
@@ -482,7 +1449,7 @@ public class Inicio extends JFrame {
 							}
 							tirada = game.lanzarDado();
 							actualizarDado(tirada);
-							isCanceled = false;
+							mover(jugadorActual, tirada);
 						}
 					};
 					timer = new Timer();
@@ -493,7 +1460,7 @@ public class Inicio extends JFrame {
 		dado.setBounds(20, 10, 80, 80);
 		dado.setIcon(dado1);
 		panelDados.add(dado);
-		
+
 		/*----------------------------*\
 		|     Controlador del dado     |
 		\*----------------------------*/
@@ -503,12 +1470,12 @@ public class Inicio extends JFrame {
 				if(!isCanceled){
 					timer.cancel();
 					isCanceled = true;
-					System.out.println(tirada);
 				}
 			}
 		};
 		controlador = new Timer();
 		controlador.schedule(contTimerTask, 0, 100);
+
 	}
 	/**
 	 * Actualiza visualmente el dado
@@ -534,7 +1501,7 @@ public class Inicio extends JFrame {
 	 */
 	private void inicializarCasillas(){
 		casilla00 = new JLabel("");
-		casilla00.setBounds(30, 540, 140, 140);
+		casilla00.setBounds(game.getCasillas().get(0).getBounds());
 		casilla00.setIcon(game.getCasillas().get(0).getImagenP());
 		casilla00.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla00);
@@ -546,7 +1513,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(1);
 			}
 		});
-		casilla01.setBounds(170, 590, 120, 90);
+		casilla01.setBounds(game.getCasillas().get(1).getBounds());
 		casilla01.setIcon(game.getCasillas().get(1).getImagenP());
 		casilla01.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla01);
@@ -558,7 +1525,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(2);
 			}
 		});
-		casilla02.setBounds(290, 590, 120, 90);
+		casilla02.setBounds(game.getCasillas().get(2).getBounds());
 		casilla02.setIcon(game.getCasillas().get(2).getImagenP());
 		casilla02.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla02);
@@ -570,7 +1537,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(3);
 			}
 		});
-		casilla03.setBounds(410, 590, 120, 90);
+		casilla03.setBounds(game.getCasillas().get(3).getBounds());
 		casilla03.setIcon(game.getCasillas().get(3).getImagenP());
 		casilla03.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla03);
@@ -582,7 +1549,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(4);
 			}
 		});
-		casilla04.setBounds(530, 590, 120, 90);
+		casilla04.setBounds(game.getCasillas().get(4).getBounds());
 		casilla04.setIcon(game.getCasillas().get(4).getImagenP());
 		casilla04.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla04);
@@ -594,7 +1561,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(5);
 			}
 		});
-		casilla05.setBounds(650, 590, 120, 90);
+		casilla05.setBounds(game.getCasillas().get(5).getBounds());
 		casilla05.setIcon(game.getCasillas().get(5).getImagenP());
 		casilla05.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla05);
@@ -606,7 +1573,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(6);
 			}
 		});
-		casilla06.setBounds(770, 590, 120, 90);
+		casilla06.setBounds(game.getCasillas().get(6).getBounds());
 		casilla06.setIcon(game.getCasillas().get(6).getImagenP());
 		casilla06.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla06);
@@ -618,7 +1585,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(7);
 			}
 		});
-		casilla07.setBounds(890, 590, 120, 90);
+		casilla07.setBounds(game.getCasillas().get(7).getBounds());
 		casilla07.setIcon(game.getCasillas().get(7).getImagenP());
 		casilla07.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla07);
@@ -630,7 +1597,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(8);
 			}
 		});
-		casilla08.setBounds(1010, 590, 120, 90);
+		casilla08.setBounds(game.getCasillas().get(8).getBounds());
 		casilla08.setIcon(game.getCasillas().get(8).getImagenP());
 		casilla08.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla08);
@@ -642,7 +1609,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(9);
 			}
 		});
-		casilla09.setBounds(1130, 590, 120, 90);
+		casilla09.setBounds(game.getCasillas().get(9).getBounds());
 		casilla09.setIcon(game.getCasillas().get(9).getImagenP());
 		casilla09.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla09);
@@ -654,7 +1621,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(10);
 			}
 		});
-		casilla10.setBounds(1130, 500, 120, 90);
+		casilla10.setBounds(game.getCasillas().get(10).getBounds());
 		casilla10.setIcon(game.getCasillas().get(10).getImagenP());
 		casilla10.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla10);
@@ -666,7 +1633,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(11);
 			}
 		});
-		casilla11.setBounds(1130, 410, 120, 90);
+		casilla11.setBounds(game.getCasillas().get(11).getBounds());
 		casilla11.setIcon(game.getCasillas().get(11).getImagenP());
 		casilla11.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla11);
@@ -678,7 +1645,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(12);
 			}
 		});
-		casilla12.setBounds(1130, 320, 120, 90);
+		casilla12.setBounds(game.getCasillas().get(12).getBounds());
 		casilla12.setIcon(game.getCasillas().get(12).getImagenP());
 		casilla12.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla12);
@@ -690,7 +1657,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(13);
 			}
 		});
-		casilla13.setBounds(1130, 230, 120, 90);
+		casilla13.setBounds(game.getCasillas().get(13).getBounds());
 		casilla13.setIcon(game.getCasillas().get(13).getImagenP());
 		casilla13.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla13);
@@ -702,7 +1669,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(14);
 			}
 		});
-		casilla14.setBounds(1130,140, 120, 90);
+		casilla14.setBounds(game.getCasillas().get(14).getBounds());
 		casilla14.setIcon(game.getCasillas().get(14).getImagenP());
 		casilla14.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla14);
@@ -714,7 +1681,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(15);
 			}
 		});
-		casilla15.setBounds(1010,140, 120, 90);
+		casilla15.setBounds(game.getCasillas().get(15).getBounds());
 		casilla15.setIcon(game.getCasillas().get(15).getImagenP());
 		casilla15.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla15);
@@ -726,7 +1693,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(16);
 			}
 		});
-		casilla16.setBounds(890,140, 120, 90);
+		casilla16.setBounds(game.getCasillas().get(16).getBounds());
 		casilla16.setIcon(game.getCasillas().get(16).getImagenP());
 		casilla16.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla16);
@@ -738,13 +1705,13 @@ public class Inicio extends JFrame {
 				mostrarCasilla(17);
 			}
 		});
-		casilla17.setBounds(890, 230, 120, 90);
+		casilla17.setBounds(game.getCasillas().get(17).getBounds());
 		casilla17.setIcon(game.getCasillas().get(17).getImagenP());
 		casilla17.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla17);
 
 		casilla18 = new JLabel("");
-		casilla18.setBounds(890, 320, 120, 90);
+		casilla18.setBounds(game.getCasillas().get(18).getBounds());
 		casilla18.setIcon(game.getCasillas().get(18).getImagenP());
 		casilla18.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla18);
@@ -756,7 +1723,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(19);
 			}
 		});
-		casilla19.setBounds(890,410, 120, 90);
+		casilla19.setBounds(game.getCasillas().get(19).getBounds());
 		casilla19.setIcon(game.getCasillas().get(19).getImagenP());
 		casilla19.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla19);
@@ -768,7 +1735,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(20);
 			}
 		});
-		casilla20.setBounds(770,410, 120, 90);
+		casilla20.setBounds(game.getCasillas().get(20).getBounds());
 		casilla20.setIcon(game.getCasillas().get(20).getImagenP());
 		casilla20.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla20);
@@ -780,7 +1747,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(21);
 			}
 		});
-		casilla21.setBounds(650,410, 120, 90);
+		casilla21.setBounds(game.getCasillas().get(21).getBounds());
 		casilla21.setIcon(game.getCasillas().get(21).getImagenP());
 		casilla21.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla21);
@@ -792,7 +1759,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(22);
 			}
 		});
-		casilla22.setBounds(530, 410, 120, 90);
+		casilla22.setBounds(game.getCasillas().get(22).getBounds());
 		casilla22.setIcon(game.getCasillas().get(22).getImagenP());
 		casilla22.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla22);
@@ -804,13 +1771,13 @@ public class Inicio extends JFrame {
 				mostrarCasilla(23);
 			}
 		});
-		casilla23.setBounds(410, 410, 120, 90);
+		casilla23.setBounds(game.getCasillas().get(23).getBounds());
 		casilla23.setIcon(game.getCasillas().get(23).getImagenP());
 		casilla23.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla23);
 
 		casilla24 = new JLabel("");
-		casilla24.setBounds(290, 410, 120, 90);
+		casilla24.setBounds(game.getCasillas().get(24).getBounds());
 		casilla24.setIcon(game.getCasillas().get(24).getImagenP());
 		casilla24.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla24);
@@ -822,7 +1789,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(25);
 			}
 		});
-		casilla25.setBounds(170, 410, 120, 90);
+		casilla25.setBounds(game.getCasillas().get(25).getBounds());
 		casilla25.setIcon(game.getCasillas().get(25).getImagenP());
 		casilla25.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla25);
@@ -834,7 +1801,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(26);
 			}
 		});
-		casilla26.setBounds(50, 410, 120, 90);
+		casilla26.setBounds(game.getCasillas().get(26).getBounds());
 		casilla26.setIcon(game.getCasillas().get(26).getImagenP());
 		casilla26.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla26);
@@ -846,7 +1813,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(27);
 			}
 		});
-		casilla27.setBounds(50, 320, 120, 90);
+		casilla27.setBounds(game.getCasillas().get(27).getBounds());
 		casilla27.setIcon(game.getCasillas().get(27).getImagenP());
 		casilla27.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla27);
@@ -858,7 +1825,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(28);
 			}
 		});
-		casilla28.setBounds(50, 230, 120, 90);
+		casilla28.setBounds(game.getCasillas().get(28).getBounds());
 		casilla28.setIcon(game.getCasillas().get(28).getImagenP());
 		casilla28.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla28);
@@ -870,7 +1837,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(29);
 			}
 		});
-		casilla29.setBounds(170, 230, 120, 90);
+		casilla29.setBounds(game.getCasillas().get(29).getBounds());
 		casilla29.setIcon(game.getCasillas().get(29).getImagenP());
 		casilla29.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla29);
@@ -882,7 +1849,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(30);
 			}
 		});
-		casilla30.setBounds(290, 230, 120, 90);
+		casilla30.setBounds(game.getCasillas().get(30).getBounds());
 		casilla30.setIcon(game.getCasillas().get(30).getImagenP());
 		casilla30.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla30);
@@ -894,7 +1861,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(31);
 			}
 		});
-		casilla31.setBounds(410, 230, 120, 90);
+		casilla31.setBounds(game.getCasillas().get(31).getBounds());
 		casilla31.setIcon(game.getCasillas().get(31).getImagenP());
 		casilla31.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla31);
@@ -906,7 +1873,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(32);
 			}
 		});
-		casilla32.setBounds(530, 230, 120, 90);
+		casilla32.setBounds(game.getCasillas().get(32).getBounds());
 		casilla32.setIcon(game.getCasillas().get(32).getImagenP());
 		casilla32.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla32);
@@ -918,13 +1885,13 @@ public class Inicio extends JFrame {
 				mostrarCasilla(33);
 			}
 		});
-		casilla33.setBounds(650, 230, 120, 90);
+		casilla33.setBounds(game.getCasillas().get(33).getBounds());
 		casilla33.setIcon(game.getCasillas().get(33).getImagenP());
 		casilla33.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla33);
 
 		casilla34 = new JLabel("");
-		casilla34.setBounds(650, 140, 120, 90);
+		casilla34.setBounds(game.getCasillas().get(34).getBounds());
 		casilla34.setIcon(game.getCasillas().get(34).getImagenP());
 		casilla34.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla34);
@@ -936,7 +1903,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(35);
 			}
 		});
-		casilla35.setBounds(650, 50, 120, 90);
+		casilla35.setBounds(game.getCasillas().get(35).getBounds());
 		casilla35.setIcon(game.getCasillas().get(35).getImagenP());
 		casilla35.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla35);
@@ -948,7 +1915,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(36);
 			}
 		});
-		casilla36.setBounds(530, 50, 120, 90);
+		casilla36.setBounds(game.getCasillas().get(36).getBounds());
 		casilla36.setIcon(game.getCasillas().get(36).getImagenP());
 		casilla36.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla36);
@@ -960,13 +1927,13 @@ public class Inicio extends JFrame {
 				mostrarCasilla(37);
 			}
 		});
-		casilla37.setBounds(410, 50, 120, 90);
+		casilla37.setBounds(game.getCasillas().get(37).getBounds());
 		casilla37.setIcon(game.getCasillas().get(37).getImagenP());
 		casilla37.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla37);
 
 		casilla38 = new JLabel("");
-		casilla38.setBounds(290, 50, 120, 90);
+		casilla38.setBounds(game.getCasillas().get(38).getBounds());
 		casilla38.setIcon(game.getCasillas().get(38).getImagenP());
 		casilla38.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla38);
@@ -978,7 +1945,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(39);
 			}
 		});
-		casilla39.setBounds(170, 50, 120, 90);
+		casilla39.setBounds(game.getCasillas().get(39).getBounds());
 		casilla39.setIcon(game.getCasillas().get(39).getImagenP());
 		casilla39.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla39);
@@ -990,7 +1957,7 @@ public class Inicio extends JFrame {
 				mostrarCasilla(40);
 			}
 		});
-		casilla40.setBounds(30, 30, 140, 140);
+		casilla40.setBounds(game.getCasillas().get(40).getBounds());
 		casilla40.setIcon(game.getCasillas().get(40).getImagenP());
 		casilla40.setBorder(new LineBorder(Color.black, 1));
 		panelTablero.add(casilla40);
@@ -1037,24 +2004,39 @@ public class Inicio extends JFrame {
 		panelCasilla.setBackground(Color.WHITE);
 		panelCasilla.setBounds(1, 27, 1278, 692);
 		panelCasilla.setLayout(null);
-		contentPane.add(panelCasilla);
 
 		casillaG = new JLabel("");
 		casillaG.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				llamarPanelTablero(panelCasilla);
+				if(!terminarJuego)
+					llamarPanelTablero(panelCasilla);
+				else{
+					dispose();
+					este = new Inicio();
+					este.setVisible(true);
+				}
 			}
 		});
 		casillaG.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
-				llamarPanelTablero(panelCasilla);
+				if(!terminarJuego)
+					llamarPanelTablero(panelCasilla);
+				else{
+					dispose();
+					este = new Inicio();
+					este.setVisible(true);
+				}
 			}
 		});
 		casillaG.setBounds(0, 0, 1278, 692);
 		casillaG.setIcon(game.getCasillas().get(pos).getImagenG());
 		panelCasilla.add(casillaG);
+
+
+		contentPane.add(panelCasilla);
+		repaint();
 		casillaG.requestFocus();
 	}
 
@@ -1079,6 +2061,8 @@ public class Inicio extends JFrame {
 				if(btnIniciar.isEnabled()){
 					llamarPanelTablero(panelInicio);
 					game = new Juego(j1, j2);
+					jugadorActual = j1;
+					colocarFichas();
 					inicializarCasillas();
 					inicializarZonaDados();
 				}
@@ -1104,7 +2088,12 @@ public class Inicio extends JFrame {
 	 * dependiendo si son correctos los datos de los jugadores
 	 */
 	private void actualizarBoton(){
+		boolean ok = false;
 		if(j1 != null && j2 != null)
+			if(!j1.getColor().equals(j2.getColor()))
+				ok = true;
+
+		if(ok)
 			btnIniciar.setEnabled(true);
 		else
 			btnIniciar.setEnabled(false);
