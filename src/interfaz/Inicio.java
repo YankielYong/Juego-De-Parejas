@@ -43,7 +43,6 @@ import java.awt.event.FocusEvent;
 public class Inicio extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	private Inicio este;
 
 	/*
 	 * Panel General
@@ -169,13 +168,13 @@ public class Inicio extends JFrame {
 	private TimerTask contFichasTT;
 	private Timer contFichas;
 	private boolean moviendoFicha = false;
+	private boolean sePuedeJugar = true;
 
 	private boolean terminarJuego = false;
 	private Juego game;
 	private Jugador j1;
 	private Jugador j2;
 	private Jugador jugadorActual;
-
 
 
 	public static void main(String[] args) {
@@ -192,9 +191,7 @@ public class Inicio extends JFrame {
 	}
 
 	public Inicio() {
-		
-		este = this;
-		
+
 		/*-----------------------------------*\
 		|     Panel General Con Sus Datos     |
 		\*-----------------------------------*/
@@ -299,199 +296,8 @@ public class Inicio extends JFrame {
 		/*---------------------------------------------------------------*\
 		|     Panel Inicio para introducir los datos de los jugadores     |
 		\*---------------------------------------------------------------*/
-		panelInicio = new JPanel();
-		panelInicio.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if(panelColorVisible)
-					cerrarPanelColor();
-			}
-		});
-		panelInicio.setBackground(Color.WHITE);
-		panelInicio.setBounds(1, 27, 1278, 692);
-		panelInicio.setLayout(null);
+		crearPanelInicio();
 		contentPane.add(panelInicio);
-
-		lblJ1 = new JLabel("Jugador 1");
-		lblJ1.setForeground(Color.BLACK);
-		lblJ1.setFont(new Font("Comic Sans MS", Font.PLAIN, 30));
-		lblJ1.setBounds(400, 220, 300, 50);
-		panelInicio.add(lblJ1);
-
-		lblJ2 = new JLabel("Jugador 2");
-		lblJ2.setForeground(Color.BLACK);
-		lblJ2.setFont(new Font("Comic Sans MS", Font.PLAIN, 30));
-		lblJ2.setBounds(400, 380, 300, 50);
-		panelInicio.add(lblJ2);
-
-		lblTitulo = new JLabel();
-		lblTitulo.setIcon(new ImageIcon(Inicio.class.getResource("/imagenes/titulo.png")));
-		lblTitulo.setBounds(140, 40, 1000, 100);
-		panelInicio.add(lblTitulo);
-
-		txtJ1 = new JTextField();
-		txtJ1.addFocusListener(new FocusAdapter() {
-			@Override
-			public void focusGained(FocusEvent e) {
-				if(panelColorVisible)
-					cerrarPanelColor();
-			}
-		});
-		txtJ1.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyReleased(KeyEvent e) {
-				realizarAccion(1, e.getKeyCode());
-				txt = txtJ1.getText();
-				if(Validaciones.jugador(txt)){
-					j1 = new Jugador(txt, colorJ1.getBackground());
-					actualizarBoton();
-				}
-				else{
-					j1 = null;
-					actualizarBoton();
-				}
-			}
-			@Override
-			public void keyTyped(KeyEvent e) {
-				int key = e.getKeyChar();
-				boolean ok = false;
-				if((key >= 65 && key <= 90) || (key >= 97 && key <= 122))
-					ok = true;
-				if(!ok)
-					e.consume();
-			}
-		});
-		txtJ1.setFont(new Font("Arial", Font.PLAIN, 24));
-		txtJ1.setForeground(Color.BLACK);
-		txtJ1.setBorder(new LineBorder(new Color(200, 0, 0), 4, true));
-		txtJ1.setBackground(Color.WHITE);
-		txtJ1.setBounds(400, 270, 480, 50);
-		panelInicio.add(txtJ1);
-
-		txtJ2 = new JTextField();
-		txtJ2.addFocusListener(new FocusAdapter() {
-			@Override
-			public void focusGained(FocusEvent e) {
-				if(panelColorVisible)
-					cerrarPanelColor();
-			}
-		});
-		txtJ2.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyReleased(KeyEvent e) {
-				realizarAccion(2, e.getKeyCode());
-				txt = txtJ2.getText();
-				if(Validaciones.jugador(txt)){
-					j2 = new Jugador(txt, colorJ2.getBackground());
-					actualizarBoton();
-				}
-				else{
-					j2 = null;
-					actualizarBoton();
-				}
-			}
-			@Override
-			public void keyTyped(KeyEvent e) {
-				int key = e.getKeyChar();
-				boolean ok = false;
-				if((key >= 65 && key <= 90) || (key >= 97 && key <= 122))
-					ok = true;
-				if(!ok)
-					e.consume();
-			}
-		});
-		txtJ2.setFont(new Font("Arial", Font.PLAIN, 24));
-		txtJ2.setForeground(Color.BLACK);
-		txtJ2.setBorder(new LineBorder(new Color(200, 0, 0), 4, true));
-		txtJ2.setBackground(Color.WHITE);
-		txtJ2.setBounds(400, 430, 480, 50);
-		panelInicio.add(txtJ2);
-
-		colorJ1 = new JLabel("");
-		colorJ1.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if(panelColorVisible)
-					cerrarPanelColor();
-				llamarPanelCambiarColor(colorJ1);
-				panelColorVisible = true;
-			}
-		});
-		colorJ1.setOpaque(true);
-		colorJ1.setBackground(new Color(255, 0, 0));
-		colorJ1.setBorder(new LineBorder(new Color(80, 80, 80), 2));
-		colorJ1.setBounds(900, 270, 50, 50);
-		panelInicio.add(colorJ1);
-
-		colorJ2 = new JLabel("");
-		colorJ2.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if(panelColorVisible)
-					cerrarPanelColor();
-				llamarPanelCambiarColor(colorJ2);
-				panelColorVisible = true;
-			}
-		});
-		colorJ2.setOpaque(true);
-		colorJ2.setBackground(new Color(0, 112, 192));
-		colorJ2.setBorder(new LineBorder(new Color(80, 80, 80), 2));
-		colorJ2.setBounds(900, 430, 50, 50);
-		panelInicio.add(colorJ2);
-
-		btnIniciar = new JButton("Jugar");
-		btnIniciar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				llamarPanelTablero(panelInicio);
-				game = new Juego(j1, j2);
-				jugadorActual = j1;
-				colocarFichas();
-				inicializarCasillas();
-				inicializarZonaDados();
-			}
-		});
-		btnIniciar.setModel(new MyButtonModel());
-		btnIniciar.setForeground(Color.BLACK);
-		btnIniciar.setBorder(new LineBorder(new Color(150, 0, 0), 4));
-		btnIniciar.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				if(btnIniciar.isEnabled())
-					btnIniciar.setBackground(Color.red);
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				if(btnIniciar.isEnabled())
-					btnIniciar.setBackground(Color.white);
-			}
-		});
-		btnIniciar.setFont(new Font("Arial", Font.BOLD, 30));
-		btnIniciar.setBackground(Color.white);
-		btnIniciar.setBounds(400, 580, 480, 50);
-		btnIniciar.setFocusable(false);
-		btnIniciar.setEnabled(false);
-		panelInicio.add(btnIniciar);
-
-		lblCorazon = new JLabel("");
-		lblCorazon.setIcon(new ImageIcon(Inicio.class.getResource("/imagenes/coraz dr.png")));
-		lblCorazon.setBounds(140, 254, 98, 98);
-		panelInicio.add(lblCorazon);
-
-		lblLabios = new JLabel("");
-		lblLabios.setIcon(new ImageIcon(Inicio.class.getResource("/imagenes/labios 96.png")));
-		lblLabios.setBounds(987, 500, 96, 96);
-		panelInicio.add(lblLabios);
-
-		lblFuego = new JLabel("");
-		lblFuego.setIcon(new ImageIcon(Inicio.class.getResource("/imagenes/emoji fuego 96.png")));
-		lblFuego.setBounds(208, 474, 96, 96);
-		panelInicio.add(lblFuego);
-
-		lblEmoji = new JLabel("");
-		lblEmoji.setIcon(new ImageIcon(Inicio.class.getResource("/imagenes/emoji enamorado 96.png")));
-		lblEmoji.setBounds(1110, 270, 98, 98);
-		panelInicio.add(lblEmoji);
-
 
 		/*---------------------*\
 		|     Panel Tablero     |
@@ -508,11 +314,10 @@ public class Inicio extends JFrame {
 		panelDados.setLayout(null);
 		panelTablero.add(panelDados);
 
-
 	}
 
 	/**
-	 * Coloca las fichas
+	 * Coloca visualmente las fichas
 	 */
 	private void colocarFichas(){
 		ImageIcon imgFicha1 = null;
@@ -634,7 +439,7 @@ public class Inicio extends JFrame {
 			}
 		};
 		contFichas = new Timer();
-		contFichas.schedule(contFichasTT, 0, 1000); 
+		contFichas.schedule(contFichasTT, 0, 100); 
 	}
 
 	/**
@@ -645,6 +450,7 @@ public class Inicio extends JFrame {
 	private void mover(Jugador j, int tirada){
 		if(j.equals(j1)){
 			if(j1.getPosicion() + tirada <= 40){
+				sePuedeJugar = false;
 				for(int i=0; i<tirada; i++){
 					int pos = j1.getPosicion();
 					dormir(1);
@@ -687,9 +493,11 @@ public class Inicio extends JFrame {
 				else
 					mostrarCasilla(j1.getPosicion());
 				cambiarTurno();
+				sePuedeJugar = true;
 			}
 			else{
 				for(int i=0; i<tirada; i++){
+					sePuedeJugar = false;
 					int pos = j1.getPosicion();
 					dormir(1);
 					retrocederFicha(fichaJ1, 1, pos, pos-1);
@@ -712,11 +520,13 @@ public class Inicio extends JFrame {
 				}
 				else
 					mostrarCasilla(j1.getPosicion());
+				sePuedeJugar = true;
 				cambiarTurno();
 			}
 		}
 		else{
 			if(j2.getPosicion() + tirada <= 40){
+				sePuedeJugar = false;
 				for(int i=0; i<tirada; i++){
 					int pos = j2.getPosicion();
 					dormir(1);
@@ -759,8 +569,10 @@ public class Inicio extends JFrame {
 				else
 					mostrarCasilla(j2.getPosicion());
 				cambiarTurno();
+				sePuedeJugar = true;
 			}
 			else{
+				sePuedeJugar = false;
 				for(int i=0; i<tirada; i++){
 					int pos = j2.getPosicion();
 					dormir(1);
@@ -785,6 +597,7 @@ public class Inicio extends JFrame {
 				else
 					mostrarCasilla(j2.getPosicion());
 				cambiarTurno();
+				sePuedeJugar = true;
 			}
 		}
 	}
@@ -817,7 +630,6 @@ public class Inicio extends JFrame {
 		switch(numeroJugador){
 		case 1:
 			if((inicio >= 0 && inicio <= 8) || (inicio >= 28 && inicio <= 32)){
-				moviendoFicha = true;
 				animMover = new TimerTask() {
 					@Override
 					public void run() {
@@ -826,13 +638,13 @@ public class Inicio extends JFrame {
 							int y = ficha.getY();
 							moverPaso(ficha, ++x, y);
 						}
+						moviendoFicha = true;
 					}
 				};
 				timer = new Timer();
 				timer.schedule(animMover,0,2*60*10000);
 			}
 			else if((inicio >= 9 && inicio <= 13) || (inicio >= 26 && inicio <= 27) || (inicio >= 33 && inicio <= 34)){
-				moviendoFicha = true;
 				animMover = new TimerTask() {
 					@Override
 					public void run() {
@@ -841,13 +653,13 @@ public class Inicio extends JFrame {
 							int y = ficha.getY();
 							moverPaso(ficha, x, --y);
 						}
+						moviendoFicha = true;
 					}
 				};
 				timer = new Timer();
 				timer.schedule(animMover,0,2*60*10000);
 			}
 			else if((inicio >= 14 && inicio <= 15) || (inicio >= 19 && inicio <= 25) || (inicio >= 35 && inicio <= 39)){
-				moviendoFicha = true;
 				animMover = new TimerTask() {
 					@Override
 					public void run() {
@@ -856,13 +668,13 @@ public class Inicio extends JFrame {
 							int y = ficha.getY();
 							moverPaso(ficha, --x, y);
 						}
+						moviendoFicha = true;
 					}
 				};
 				timer = new Timer();
 				timer.schedule(animMover,0,2*60*10000);
 			}
 			else if(inicio >= 16 && inicio <= 18){
-				moviendoFicha = true;
 				animMover = new TimerTask() {
 					@Override
 					public void run() {
@@ -871,6 +683,7 @@ public class Inicio extends JFrame {
 							int y = ficha.getY();
 							moverPaso(ficha, x, ++y);
 						}
+						moviendoFicha = true;
 					}
 				};
 				timer = new Timer();
@@ -880,7 +693,6 @@ public class Inicio extends JFrame {
 
 		case 2:
 			if((inicio >= 0 && inicio <= 8) || (inicio >= 28 && inicio <= 32)){
-				moviendoFicha = true;
 				animMover = new TimerTask() {
 					@Override
 					public void run() {
@@ -889,13 +701,13 @@ public class Inicio extends JFrame {
 							int y = ficha.getY();
 							moverPaso(ficha, ++x, y);
 						}
+						moviendoFicha = true;
 					}
 				};
 				timer = new Timer();
 				timer.schedule(animMover,0,2*60*10000);
 			}
 			else if((inicio >= 9 && inicio <= 13) || (inicio >= 26 && inicio <= 27) || (inicio >= 33 && inicio <= 34)){
-				moviendoFicha = true;
 				animMover = new TimerTask() {
 					@Override
 					public void run() {
@@ -904,13 +716,13 @@ public class Inicio extends JFrame {
 							int y = ficha.getY();
 							moverPaso(ficha, x, --y);
 						}
+						moviendoFicha = true;
 					}
 				};
 				timer = new Timer();
 				timer.schedule(animMover,0,2*60*10000);
 			}
 			else if((inicio >= 14 && inicio <= 15) || (inicio >= 19 && inicio <= 25) || (inicio >= 35 && inicio <= 39)){
-				moviendoFicha = true;
 				animMover = new TimerTask() {
 					@Override
 					public void run() {
@@ -919,13 +731,13 @@ public class Inicio extends JFrame {
 							int y = ficha.getY();
 							moverPaso(ficha, --x, y);
 						}
+						moviendoFicha = true;
 					}
 				};
 				timer = new Timer();
 				timer.schedule(animMover,0,2*60*10000);
 			}
 			else if(inicio >= 16 && inicio <= 18){
-				moviendoFicha = true;
 				animMover = new TimerTask() {
 					@Override
 					public void run() {
@@ -934,6 +746,7 @@ public class Inicio extends JFrame {
 							int y = ficha.getY();
 							moverPaso(ficha, x, ++y);
 						}
+						moviendoFicha = true;
 					}
 				};
 				timer = new Timer();
@@ -954,7 +767,6 @@ public class Inicio extends JFrame {
 		switch(numeroJugador){
 		case 1:
 			if(inicio >= 36 && inicio <= 39){
-				moviendoFicha = true;
 				animMover = new TimerTask() {
 					@Override
 					public void run() {
@@ -963,13 +775,13 @@ public class Inicio extends JFrame {
 							int y = ficha.getY();
 							moverPaso(ficha, ++x, y);
 						}
+						moviendoFicha = true;
 					}
 				};
 				timer = new Timer();
 				timer.schedule(animMover,0,2*60*10000);
 			}
 			else if(inicio >= 34 && inicio <= 35){
-				moviendoFicha = true;
 				animMover = new TimerTask() {
 					@Override
 					public void run() {
@@ -978,13 +790,13 @@ public class Inicio extends JFrame {
 							int y = ficha.getY();
 							moverPaso(ficha, x, ++y);
 						}
+						moviendoFicha = true;
 					}
 				};
 				timer = new Timer();
 				timer.schedule(animMover,0,2*60*10000);
 			}
 			else if(inicio >= 29 && inicio <= 33){
-				moviendoFicha = true;
 				animMover = new TimerTask() {
 					@Override
 					public void run() {
@@ -993,6 +805,7 @@ public class Inicio extends JFrame {
 							int y = ficha.getY();
 							moverPaso(ficha, --x, y);
 						}
+						moviendoFicha = true;
 					}
 				};
 				timer = new Timer();
@@ -1001,7 +814,6 @@ public class Inicio extends JFrame {
 			break;
 		case 2:
 			if(inicio >= 36 && inicio <= 39){
-				moviendoFicha = true;
 				animMover = new TimerTask() {
 					@Override
 					public void run() {
@@ -1010,13 +822,13 @@ public class Inicio extends JFrame {
 							int y = ficha.getY();
 							moverPaso(ficha, ++x, y);
 						}
+						moviendoFicha = true;
 					}
 				};
 				timer = new Timer();
 				timer.schedule(animMover,0,2*60*10000);
 			}
 			else if(inicio >= 34 && inicio <= 35){
-				moviendoFicha = true;
 				animMover = new TimerTask() {
 					@Override
 					public void run() {
@@ -1025,13 +837,13 @@ public class Inicio extends JFrame {
 							int y = ficha.getY();
 							moverPaso(ficha, x, ++y);
 						}
+						moviendoFicha = true;
 					}
 				};
 				timer = new Timer();
 				timer.schedule(animMover,0,2*60*10000);
 			}
 			else if(inicio >= 29 && inicio <= 33){
-				moviendoFicha = true;
 				animMover = new TimerTask() {
 					@Override
 					public void run() {
@@ -1040,6 +852,7 @@ public class Inicio extends JFrame {
 							int y = ficha.getY();
 							moverPaso(ficha, --x, y);
 						}
+						moviendoFicha = true;
 					}
 				};
 				timer = new Timer();
@@ -1049,6 +862,7 @@ public class Inicio extends JFrame {
 		}
 
 	}
+	
 	/**
 	 * Mueve la ficha a la posicion indicada
 	 * @param ficha ficha a mover
@@ -1077,6 +891,7 @@ public class Inicio extends JFrame {
 		}
 		ficha.setLocation(x, y);
 	}
+	
 	/**
 	 * Mueve la ficha a traves de un puente
 	 * @param fich la ficha a mover
@@ -1087,7 +902,6 @@ public class Inicio extends JFrame {
 		final JLabel ficha = fich;
 		switch(numeroJugador){
 		case 1:
-			moviendoFicha = true;
 			animMover = new TimerTask() {
 				@Override
 				public void run() {
@@ -1101,13 +915,13 @@ public class Inicio extends JFrame {
 						int y = ficha.getY();
 						moverPasoLento(ficha, ++x, y);
 					}
+					moviendoFicha = true;
 				}
 			};
 			timer = new Timer();
 			timer.schedule(animMover,0,2*60*10000);
 			break;
 		case 2:
-			moviendoFicha = true;
 			animMover = new TimerTask() {
 				@Override
 				public void run() {
@@ -1121,6 +935,7 @@ public class Inicio extends JFrame {
 						int y = ficha.getY();
 						moverPasoLento(ficha, ++x, y);
 					}
+					moviendoFicha = true;
 				}
 			};
 			timer = new Timer();
@@ -1138,7 +953,6 @@ public class Inicio extends JFrame {
 		final JLabel ficha = fich;
 		switch(numeroJugador){
 		case 1:
-			moviendoFicha = true;
 			animMover = new TimerTask() {
 				@Override
 				public void run() {
@@ -1152,13 +966,13 @@ public class Inicio extends JFrame {
 						int y = ficha.getY();
 						moverPasoLento(ficha, x, ++y);
 					}
+					moviendoFicha = true;
 				}
 			};
 			timer = new Timer();
 			timer.schedule(animMover,0,2*60*10000);
 			break;
 		case 2:
-			moviendoFicha = true;
 			animMover = new TimerTask() {
 				@Override
 				public void run() {
@@ -1172,6 +986,7 @@ public class Inicio extends JFrame {
 						int y = ficha.getY();
 						moverPasoLento(ficha, x, ++y);
 					}
+					moviendoFicha = true;
 				}
 			};
 			timer = new Timer();
@@ -1179,6 +994,7 @@ public class Inicio extends JFrame {
 			break;
 		}
 	}
+	
 	/**
 	 * duerme un periodo corto
 	 * @param i
@@ -1384,6 +1200,7 @@ public class Inicio extends JFrame {
 		panelInicio.add(panelColor);
 		panelInicio.repaint();
 	}
+	
 	/**
 	 * Cierra el panel de cambiar el color del jugador
 	 */
@@ -1393,6 +1210,7 @@ public class Inicio extends JFrame {
 		actualizarBoton();
 		panelColorVisible = false;
 	}
+	
 	/**
 	 * Inicializa y coloca lo relacionado al dado
 	 */
@@ -1439,8 +1257,8 @@ public class Inicio extends JFrame {
 		dado.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if(isCanceled && !moviendoFicha){
-					isCanceled = false;
+				if(isCanceled && sePuedeJugar){
+					sePuedeJugar = false;
 					TimerTask animTask = new TimerTask() {
 						@Override
 						public void run() {
@@ -1450,6 +1268,7 @@ public class Inicio extends JFrame {
 							tirada = game.lanzarDado();
 							actualizarDado(tirada);
 							mover(jugadorActual, tirada);
+							isCanceled = false;
 						}
 					};
 					timer = new Timer();
@@ -1470,6 +1289,7 @@ public class Inicio extends JFrame {
 				if(!isCanceled){
 					timer.cancel();
 					isCanceled = true;
+					sePuedeJugar = true;
 				}
 			}
 		};
@@ -1477,6 +1297,7 @@ public class Inicio extends JFrame {
 		controlador.schedule(contTimerTask, 0, 100);
 
 	}
+
 	/**
 	 * Actualiza visualmente el dado
 	 */
@@ -1496,6 +1317,7 @@ public class Inicio extends JFrame {
 		case 6: dado.setIcon(dado6); break;
 		}
 	}
+	
 	/**
 	 * Coloca visualmente las casillas del tablero
 	 */
@@ -1510,7 +1332,8 @@ public class Inicio extends JFrame {
 		casilla01.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(1);
+				if(sePuedeJugar)
+					mostrarCasilla(1);
 			}
 		});
 		casilla01.setBounds(game.getCasillas().get(1).getBounds());
@@ -1522,7 +1345,8 @@ public class Inicio extends JFrame {
 		casilla02.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(2);
+				if(sePuedeJugar)
+					mostrarCasilla(2);
 			}
 		});
 		casilla02.setBounds(game.getCasillas().get(2).getBounds());
@@ -1534,7 +1358,8 @@ public class Inicio extends JFrame {
 		casilla03.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(3);
+				if(sePuedeJugar)
+					mostrarCasilla(3);
 			}
 		});
 		casilla03.setBounds(game.getCasillas().get(3).getBounds());
@@ -1546,7 +1371,8 @@ public class Inicio extends JFrame {
 		casilla04.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(4);
+				if(sePuedeJugar)
+					mostrarCasilla(4);
 			}
 		});
 		casilla04.setBounds(game.getCasillas().get(4).getBounds());
@@ -1558,7 +1384,8 @@ public class Inicio extends JFrame {
 		casilla05.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(5);
+				if(sePuedeJugar)
+					mostrarCasilla(5);
 			}
 		});
 		casilla05.setBounds(game.getCasillas().get(5).getBounds());
@@ -1570,7 +1397,8 @@ public class Inicio extends JFrame {
 		casilla06.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(6);
+				if(sePuedeJugar)
+					mostrarCasilla(6);
 			}
 		});
 		casilla06.setBounds(game.getCasillas().get(6).getBounds());
@@ -1582,7 +1410,8 @@ public class Inicio extends JFrame {
 		casilla07.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(7);
+				if(sePuedeJugar)
+					mostrarCasilla(7);
 			}
 		});
 		casilla07.setBounds(game.getCasillas().get(7).getBounds());
@@ -1594,7 +1423,8 @@ public class Inicio extends JFrame {
 		casilla08.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(8);
+				if(sePuedeJugar)
+					mostrarCasilla(8);
 			}
 		});
 		casilla08.setBounds(game.getCasillas().get(8).getBounds());
@@ -1606,7 +1436,8 @@ public class Inicio extends JFrame {
 		casilla09.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(9);
+				if(sePuedeJugar)
+					mostrarCasilla(9);
 			}
 		});
 		casilla09.setBounds(game.getCasillas().get(9).getBounds());
@@ -1618,7 +1449,8 @@ public class Inicio extends JFrame {
 		casilla10.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(10);
+				if(sePuedeJugar)
+					mostrarCasilla(10);
 			}
 		});
 		casilla10.setBounds(game.getCasillas().get(10).getBounds());
@@ -1630,7 +1462,8 @@ public class Inicio extends JFrame {
 		casilla11.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(11);
+				if(sePuedeJugar)
+					mostrarCasilla(11);
 			}
 		});
 		casilla11.setBounds(game.getCasillas().get(11).getBounds());
@@ -1642,7 +1475,8 @@ public class Inicio extends JFrame {
 		casilla12.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(12);
+				if(sePuedeJugar)
+					mostrarCasilla(12);
 			}
 		});
 		casilla12.setBounds(game.getCasillas().get(12).getBounds());
@@ -1654,7 +1488,8 @@ public class Inicio extends JFrame {
 		casilla13.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(13);
+				if(sePuedeJugar)
+					mostrarCasilla(13);
 			}
 		});
 		casilla13.setBounds(game.getCasillas().get(13).getBounds());
@@ -1666,7 +1501,8 @@ public class Inicio extends JFrame {
 		casilla14.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(14);
+				if(sePuedeJugar)
+					mostrarCasilla(14);
 			}
 		});
 		casilla14.setBounds(game.getCasillas().get(14).getBounds());
@@ -1678,7 +1514,8 @@ public class Inicio extends JFrame {
 		casilla15.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(15);
+				if(sePuedeJugar)
+					mostrarCasilla(15);
 			}
 		});
 		casilla15.setBounds(game.getCasillas().get(15).getBounds());
@@ -1690,7 +1527,8 @@ public class Inicio extends JFrame {
 		casilla16.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(16);
+				if(sePuedeJugar)
+					mostrarCasilla(16);
 			}
 		});
 		casilla16.setBounds(game.getCasillas().get(16).getBounds());
@@ -1702,7 +1540,8 @@ public class Inicio extends JFrame {
 		casilla17.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(17);
+				if(sePuedeJugar)
+					mostrarCasilla(17);
 			}
 		});
 		casilla17.setBounds(game.getCasillas().get(17).getBounds());
@@ -1720,7 +1559,8 @@ public class Inicio extends JFrame {
 		casilla19.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(19);
+				if(sePuedeJugar)
+					mostrarCasilla(19);
 			}
 		});
 		casilla19.setBounds(game.getCasillas().get(19).getBounds());
@@ -1732,7 +1572,8 @@ public class Inicio extends JFrame {
 		casilla20.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(20);
+				if(sePuedeJugar)
+					mostrarCasilla(20);
 			}
 		});
 		casilla20.setBounds(game.getCasillas().get(20).getBounds());
@@ -1744,7 +1585,8 @@ public class Inicio extends JFrame {
 		casilla21.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(21);
+				if(sePuedeJugar)
+					mostrarCasilla(21);
 			}
 		});
 		casilla21.setBounds(game.getCasillas().get(21).getBounds());
@@ -1756,7 +1598,8 @@ public class Inicio extends JFrame {
 		casilla22.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(22);
+				if(sePuedeJugar)
+					mostrarCasilla(22);
 			}
 		});
 		casilla22.setBounds(game.getCasillas().get(22).getBounds());
@@ -1768,7 +1611,8 @@ public class Inicio extends JFrame {
 		casilla23.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(23);
+				if(sePuedeJugar)
+					mostrarCasilla(23);
 			}
 		});
 		casilla23.setBounds(game.getCasillas().get(23).getBounds());
@@ -1786,7 +1630,8 @@ public class Inicio extends JFrame {
 		casilla25.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(25);
+				if(sePuedeJugar)
+					mostrarCasilla(25);
 			}
 		});
 		casilla25.setBounds(game.getCasillas().get(25).getBounds());
@@ -1798,7 +1643,8 @@ public class Inicio extends JFrame {
 		casilla26.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(26);
+				if(sePuedeJugar)
+					mostrarCasilla(26);
 			}
 		});
 		casilla26.setBounds(game.getCasillas().get(26).getBounds());
@@ -1810,7 +1656,8 @@ public class Inicio extends JFrame {
 		casilla27.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(27);
+				if(sePuedeJugar)
+					mostrarCasilla(27);
 			}
 		});
 		casilla27.setBounds(game.getCasillas().get(27).getBounds());
@@ -1822,7 +1669,8 @@ public class Inicio extends JFrame {
 		casilla28.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(28);
+				if(sePuedeJugar)
+					mostrarCasilla(28);
 			}
 		});
 		casilla28.setBounds(game.getCasillas().get(28).getBounds());
@@ -1834,7 +1682,8 @@ public class Inicio extends JFrame {
 		casilla29.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(29);
+				if(sePuedeJugar)
+					mostrarCasilla(29);
 			}
 		});
 		casilla29.setBounds(game.getCasillas().get(29).getBounds());
@@ -1846,7 +1695,8 @@ public class Inicio extends JFrame {
 		casilla30.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(30);
+				if(sePuedeJugar)
+					mostrarCasilla(30);
 			}
 		});
 		casilla30.setBounds(game.getCasillas().get(30).getBounds());
@@ -1858,7 +1708,8 @@ public class Inicio extends JFrame {
 		casilla31.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(31);
+				if(sePuedeJugar)
+					mostrarCasilla(31);
 			}
 		});
 		casilla31.setBounds(game.getCasillas().get(31).getBounds());
@@ -1870,7 +1721,8 @@ public class Inicio extends JFrame {
 		casilla32.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(32);
+				if(sePuedeJugar)
+					mostrarCasilla(32);
 			}
 		});
 		casilla32.setBounds(game.getCasillas().get(32).getBounds());
@@ -1882,7 +1734,8 @@ public class Inicio extends JFrame {
 		casilla33.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(33);
+				if(sePuedeJugar)
+					mostrarCasilla(33);
 			}
 		});
 		casilla33.setBounds(game.getCasillas().get(33).getBounds());
@@ -1900,7 +1753,8 @@ public class Inicio extends JFrame {
 		casilla35.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(35);
+				if(sePuedeJugar)
+					mostrarCasilla(35);
 			}
 		});
 		casilla35.setBounds(game.getCasillas().get(35).getBounds());
@@ -1912,7 +1766,8 @@ public class Inicio extends JFrame {
 		casilla36.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(36);
+				if(sePuedeJugar)
+					mostrarCasilla(36);
 			}
 		});
 		casilla36.setBounds(game.getCasillas().get(36).getBounds());
@@ -1924,7 +1779,8 @@ public class Inicio extends JFrame {
 		casilla37.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(37);
+				if(sePuedeJugar)
+					mostrarCasilla(37);
 			}
 		});
 		casilla37.setBounds(game.getCasillas().get(37).getBounds());
@@ -1942,7 +1798,8 @@ public class Inicio extends JFrame {
 		casilla39.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(39);
+				if(sePuedeJugar)
+					mostrarCasilla(39);
 			}
 		});
 		casilla39.setBounds(game.getCasillas().get(39).getBounds());
@@ -1954,7 +1811,8 @@ public class Inicio extends JFrame {
 		casilla40.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarCasilla(40);
+				if(sePuedeJugar)
+					mostrarCasilla(40);
 			}
 		});
 		casilla40.setBounds(game.getCasillas().get(40).getBounds());
@@ -1990,8 +1848,225 @@ public class Inicio extends JFrame {
 		puente02.setIcon(iconPuente);
 		panelTablero.add(puente02);
 
+		adornarTablero();
+	}
+	
+	/**
+	 * Coloca los demas adornos del tablero
+	 */
+	private void adornarTablero(){
+		ImageIcon img = new ImageIcon(Inicio.class.getResource("/imagenes/emoji fuego 96.png"));
+		Image image = img.getImage().getScaledInstance(70, 70, Image.SCALE_SMOOTH);
+		Icon iconFuego = new ImageIcon(image);
+		
+		JLabel lblFuego1 = new JLabel();
+		lblFuego1.setBounds(570, 150, 70, 70);
+		lblFuego1.setIcon(iconFuego);
+		panelTablero.add(lblFuego1);
+		
+		JLabel lblFuego2 = new JLabel();
+		lblFuego2.setBounds(770, 510, 70, 70);
+		lblFuego2.setIcon(iconFuego);
+		panelTablero.add(lblFuego2);
+		
+		img = new ImageIcon(Inicio.class.getResource("/imagenes/c3.png"));
+		image = img.getImage().getScaledInstance(27, 55, Image.SCALE_SMOOTH);
+		Icon iconCoraLarg1 = new ImageIcon(image);
+		
+		img = new ImageIcon(Inicio.class.getResource("/imagenes/c3.png"));
+		image = img.getImage().getScaledInstance(34, 70, Image.SCALE_SMOOTH);
+		Icon iconCoraLarg2 = new ImageIcon(image);
+		
+		JLabel lblCoraLarg1 = new JLabel();
+		lblCoraLarg1.setBounds(520, 145, 27, 55);
+		lblCoraLarg1.setIcon(iconCoraLarg1);
+		panelTablero.add(lblCoraLarg1);
+		
+		JLabel lblCoraLarg2 = new JLabel();
+		lblCoraLarg2.setBounds(174, 325, 34, 70);
+		lblCoraLarg2.setIcon(iconCoraLarg2);
+		panelTablero.add(lblCoraLarg2);
+		
+		JLabel lblCoraLarg3 = new JLabel();
+		lblCoraLarg3.setBounds(1088, 490, 34, 70);
+		lblCoraLarg3.setIcon(iconCoraLarg2);
+		panelTablero.add(lblCoraLarg3);
+		
+		JLabel lblCoraLarg4 = new JLabel();
+		lblCoraLarg4.setBounds(1013, 233, 27, 55);
+		lblCoraLarg4.setIcon(iconCoraLarg1);
+		panelTablero.add(lblCoraLarg4);
+		
+		JLabel lblCoraLarg5 = new JLabel();
+		lblCoraLarg5.setBounds(270, 509, 34, 70);
+		lblCoraLarg5.setIcon(iconCoraLarg2);
+		panelTablero.add(lblCoraLarg5);
+		
+		JLabel lblCoraLarg6 = new JLabel();
+		lblCoraLarg6.setBounds(270, 145, 34, 70);
+		lblCoraLarg6.setIcon(iconCoraLarg2);
+		panelTablero.add(lblCoraLarg6);
+		
+		img = new ImageIcon(Inicio.class.getResource("/imagenes/emoji coqueto girado 15 izq.png"));
+		image = img.getImage().getScaledInstance(70, 70, Image.SCALE_SMOOTH);
+		Icon iconEmojiCoquetoGirado1 = new ImageIcon(image);
+		
+		JLabel lblEmojiCoquetoGirado1 = new JLabel();
+		lblEmojiCoquetoGirado1.setBounds(1052, 260, 70, 70);
+		lblEmojiCoquetoGirado1.setIcon(iconEmojiCoquetoGirado1);
+		panelTablero.add(lblEmojiCoquetoGirado1);
+		
+		img = new ImageIcon(Inicio.class.getResource("/imagenes/corazon rosa.png"));
+		image = img.getImage().getScaledInstance(80, 63, Image.SCALE_SMOOTH);
+		Icon iconCoraRosa1 = new ImageIcon(image);
+		
+		JLabel lblCoraRosa1 = new JLabel();
+		lblCoraRosa1.setBounds(1015, 428, 80, 63);
+		lblCoraRosa1.setIcon(iconCoraRosa1);
+		panelTablero.add(lblCoraRosa1);
+		
+		JLabel lblCoraRosa2 = new JLabel();
+		lblCoraRosa2.setBounds(770, 62, 80, 63);
+		lblCoraRosa2.setIcon(iconCoraRosa1);
+		panelTablero.add(lblCoraRosa2);
+		
+		JLabel lblCoraRosa3 = new JLabel();
+		lblCoraRosa3.setBounds(667, 335, 80, 63);
+		lblCoraRosa3.setIcon(iconCoraRosa1);
+		panelTablero.add(lblCoraRosa3);
+		
+		img = new ImageIcon(Inicio.class.getResource("/imagenes/emoji enamorado babeado gir der.png"));
+		image = img.getImage().getScaledInstance(60, 65, Image.SCALE_SMOOTH);
+		Icon iconEmojiEnamBabeado1 = new ImageIcon(image);
+		
+		JLabel lblEmojiEnamBabeado1 = new JLabel();
+		lblEmojiEnamBabeado1.setBounds(1005, 512, 60, 65);
+		lblEmojiEnamBabeado1.setIcon(iconEmojiEnamBabeado1);
+		panelTablero.add(lblEmojiEnamBabeado1);
+		
+		JLabel lblEmojiEnamBabeado2 = new JLabel();
+		lblEmojiEnamBabeado2.setBounds(448, 160, 60, 65);
+		lblEmojiEnamBabeado2.setIcon(iconEmojiEnamBabeado1);
+		panelTablero.add(lblEmojiEnamBabeado2);
+		
+		img = new ImageIcon(Inicio.class.getResource("/imagenes/c2.png"));
+		image = img.getImage().getScaledInstance(100, 64, Image.SCALE_SMOOTH);
+		Icon iconC2_1 = new ImageIcon(image);
+		
+		JLabel lblC2_1 = new JLabel();
+		lblC2_1.setBounds(870, 515, 100, 64);
+		lblC2_1.setIcon(iconC2_1);
+		panelTablero.add(lblC2_1);
+		
+		JLabel lblC2_2 = new JLabel();
+		lblC2_2.setBounds(550, 330, 100, 64);
+		lblC2_2.setIcon(iconC2_1);
+		panelTablero.add(lblC2_2);
+		
+		img = new ImageIcon(Inicio.class.getResource("/imagenes/emoji diablo gir izq.png"));
+		image = img.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
+		Icon iconEmojiDiablo1 = new ImageIcon(image);
+		
+		JLabel lblEmojiDiablo1 = new JLabel();
+		lblEmojiDiablo1.setBounds(792, 232, 80, 80);
+		lblEmojiDiablo1.setIcon(iconEmojiDiablo1);
+		panelTablero.add(lblEmojiDiablo1);
+		
+		img = new ImageIcon(Inicio.class.getResource("/imagenes/labio corazon gir izq.png"));
+		image = img.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+		Icon iconLabioCora1 = new ImageIcon(image);
+		
+		JLabel lblLabioCora1 = new JLabel();
+		lblLabioCora1.setBounds(395, 148, 40, 40);
+		lblLabioCora1.setIcon(iconLabioCora1);
+		panelTablero.add(lblLabioCora1);
+		
+		JLabel lblLabioCora2 = new JLabel();
+		lblLabioCora2.setBounds(717, 515, 40, 40);
+		lblLabioCora2.setIcon(iconLabioCora1);
+		panelTablero.add(lblLabioCora2);
+		
+		JLabel lblLabioCora3 = new JLabel();
+		lblLabioCora3.setBounds(835, 110, 40, 40);
+		lblLabioCora3.setIcon(iconLabioCora1);
+		panelTablero.add(lblLabioCora3);
+		
+		img = new ImageIcon(Inicio.class.getResource("/imagenes/c4.png"));
+		image = img.getImage().getScaledInstance(74, 70, Image.SCALE_SMOOTH);
+		Icon iconC4_1 = new ImageIcon(image);
+		
+		JLabel lblC4_1 = new JLabel();
+		lblC4_1.setBounds(620, 510, 74, 70);
+		lblC4_1.setIcon(iconC4_1);
+		panelTablero.add(lblC4_1);
+		
+		JLabel lblC4_2 = new JLabel();
+		lblC4_2.setBounds(230, 330, 74, 70);
+		lblC4_2.setIcon(iconC4_1);
+		panelTablero.add(lblC4_2);
+		
+		img = new ImageIcon(Inicio.class.getResource("/imagenes/morder labio 512.png"));
+		image = img.getImage().getScaledInstance(96, 60, Image.SCALE_SMOOTH);
+		Icon iconMorderLabio = new ImageIcon(image);
+		
+		JLabel lblMorderLabio1 = new JLabel();
+		lblMorderLabio1.setBounds(755, 340, 96, 60);
+		lblMorderLabio1.setIcon(iconMorderLabio);
+		panelTablero.add(lblMorderLabio1);
+		
+		img = new ImageIcon(Inicio.class.getResource("/imagenes/labios 96.png"));
+		image = img.getImage().getScaledInstance(94, 60, Image.SCALE_SMOOTH);
+		Icon iconLabio = new ImageIcon(image);
+		
+		JLabel lblLabios1 = new JLabel();
+		lblLabios1.setBounds(430, 335, 94, 60);
+		lblLabios1.setIcon(iconLabio);
+		panelTablero.add(lblLabios1);
+		
+		img = new ImageIcon(Inicio.class.getResource("/imagenes/emoji gafas 96.png"));
+		image = img.getImage().getScaledInstance(65, 65, Image.SCALE_SMOOTH);
+		Icon iconEmojiGafas = new ImageIcon(image);
+		
+		JLabel lblEmojiGafas1 = new JLabel();
+		lblEmojiGafas1.setBounds(190, 512, 65, 65);
+		lblEmojiGafas1.setIcon(iconEmojiGafas);
+		panelTablero.add(lblEmojiGafas1);
+		
+		img = new ImageIcon(Inicio.class.getResource("/imagenes/saborear labio 512.png"));
+		image = img.getImage().getScaledInstance(80, 70, Image.SCALE_SMOOTH);
+		Icon iconSaborear = new ImageIcon(image);
+		
+		JLabel lblSaborear = new JLabel();
+		lblSaborear.setBounds(410, 512, 80, 70);
+		lblSaborear.setIcon(iconSaborear);
+		panelTablero.add(lblSaborear);
+		
+		img = new ImageIcon(Inicio.class.getResource("/imagenes/emoji beso gir der.png"));
+		image = img.getImage().getScaledInstance(70, 70, Image.SCALE_SMOOTH);
+		Icon iconBeso = new ImageIcon(image);
+		
+		JLabel lblBeso1 = new JLabel();
+		lblBeso1.setBounds(518, 510, 70, 70);
+		lblBeso1.setIcon(iconBeso);
+		panelTablero.add(lblBeso1);
+		
+		JLabel lblBeso2 = new JLabel();
+		lblBeso2.setBounds(190, 150, 70, 70);
+		lblBeso2.setIcon(iconBeso);
+		panelTablero.add(lblBeso2);
+		
+		img = new ImageIcon(Inicio.class.getResource("/imagenes/emoji abrazo gir izq.png"));
+		image = img.getImage().getScaledInstance(70, 70, Image.SCALE_SMOOTH);
+		Icon iconEmojiAbrazo = new ImageIcon(image);
+		
+		JLabel lblEmojiAbrazo = new JLabel();
+		lblEmojiAbrazo.setBounds(335, 330, 70, 70);
+		lblEmojiAbrazo.setIcon(iconEmojiAbrazo);
+		panelTablero.add(lblEmojiAbrazo);
+		
 	}
 
+	
 	/**
 	 * Muestra la casilla en la que ha caido un jugador
 	 * @param pos - la posicion de la casilla
@@ -2012,9 +2087,7 @@ public class Inicio extends JFrame {
 				if(!terminarJuego)
 					llamarPanelTablero(panelCasilla);
 				else{
-					dispose();
-					este = new Inicio();
-					este.setVisible(true);
+					System.exit(0);
 				}
 			}
 		});
@@ -2024,9 +2097,7 @@ public class Inicio extends JFrame {
 				if(!terminarJuego)
 					llamarPanelTablero(panelCasilla);
 				else{
-					dispose();
-					este = new Inicio();
-					este.setVisible(true);
+					System.exit(0);
 				}
 			}
 		});
@@ -2040,6 +2111,7 @@ public class Inicio extends JFrame {
 		casillaG.requestFocus();
 	}
 
+	
 	/**
 	 * Realiza la accion determinada de cada tecla
 	 * @param txtID el id del JTextField donde se presiono la tecla
@@ -2072,6 +2144,7 @@ public class Inicio extends JFrame {
 		}
 	}
 
+	
 	/**
 	 * Muestra el panel del tablero una vez se hayan 
 	 * introducido los datos de los jugadores
@@ -2097,5 +2170,213 @@ public class Inicio extends JFrame {
 			btnIniciar.setEnabled(true);
 		else
 			btnIniciar.setEnabled(false);
+	}
+
+	/**
+	 * Crea el panel de inicio
+	 */
+	private void crearPanelInicio(){
+		panelInicio = new JPanel();
+		panelInicio.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(panelColorVisible)
+					cerrarPanelColor();
+			}
+		});
+		panelInicio.setBackground(Color.WHITE);
+		panelInicio.setBounds(1, 27, 1278, 692);
+		panelInicio.setLayout(null);
+
+		lblJ1 = new JLabel("Jugador 1");
+		lblJ1.setForeground(Color.BLACK);
+		lblJ1.setFont(new Font("Comic Sans MS", Font.PLAIN, 30));
+		lblJ1.setBounds(400, 220, 300, 50);
+		panelInicio.add(lblJ1);
+
+		lblJ2 = new JLabel("Jugador 2");
+		lblJ2.setForeground(Color.BLACK);
+		lblJ2.setFont(new Font("Comic Sans MS", Font.PLAIN, 30));
+		lblJ2.setBounds(400, 380, 300, 50);
+		panelInicio.add(lblJ2);
+
+		lblTitulo = new JLabel();
+		lblTitulo.setIcon(new ImageIcon(Inicio.class.getResource("/imagenes/titulo.png")));
+		lblTitulo.setBounds(140, 40, 1000, 100);
+		panelInicio.add(lblTitulo);
+
+		txtJ1 = new JTextField();
+		txtJ1.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				if(panelColorVisible)
+					cerrarPanelColor();
+			}
+		});
+		txtJ1.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				realizarAccion(1, e.getKeyCode());
+				txt = txtJ1.getText();
+				if(Validaciones.jugador(txt)){
+					j1 = new Jugador(txt, colorJ1.getBackground());
+					actualizarBoton();
+				}
+				else{
+					j1 = null;
+					actualizarBoton();
+				}
+			}
+			@Override
+			public void keyTyped(KeyEvent e) {
+				int key = e.getKeyChar();
+				boolean ok = false;
+				if((key >= 65 && key <= 90) || (key >= 97 && key <= 122))
+					ok = true;
+				if(!ok)
+					e.consume();
+			}
+		});
+		txtJ1.setFont(new Font("Arial", Font.PLAIN, 24));
+		txtJ1.setForeground(Color.BLACK);
+		txtJ1.setBorder(new LineBorder(new Color(200, 0, 0), 4, true));
+		txtJ1.setBackground(Color.WHITE);
+		txtJ1.setBounds(400, 270, 480, 50);
+		panelInicio.add(txtJ1);
+
+		txtJ2 = new JTextField();
+		txtJ2.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				if(panelColorVisible)
+					cerrarPanelColor();
+			}
+		});
+		txtJ2.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				realizarAccion(2, e.getKeyCode());
+				txt = txtJ2.getText();
+				if(Validaciones.jugador(txt)){
+					j2 = new Jugador(txt, colorJ2.getBackground());
+					actualizarBoton();
+				}
+				else{
+					j2 = null;
+					actualizarBoton();
+				}
+			}
+			@Override
+			public void keyTyped(KeyEvent e) {
+				int key = e.getKeyChar();
+				boolean ok = false;
+				if((key >= 65 && key <= 90) || (key >= 97 && key <= 122))
+					ok = true;
+				if(!ok)
+					e.consume();
+			}
+		});
+		txtJ2.setFont(new Font("Arial", Font.PLAIN, 24));
+		txtJ2.setForeground(Color.BLACK);
+		txtJ2.setBorder(new LineBorder(new Color(200, 0, 0), 4, true));
+		txtJ2.setBackground(Color.WHITE);
+		txtJ2.setBounds(400, 430, 480, 50);
+		panelInicio.add(txtJ2);
+
+		colorJ1 = new JLabel("");
+		colorJ1.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(panelColorVisible)
+					cerrarPanelColor();
+				llamarPanelCambiarColor(colorJ1);
+				panelColorVisible = true;
+			}
+		});
+		colorJ1.setOpaque(true);
+		colorJ1.setBackground(new Color(255, 0, 0));
+		colorJ1.setBorder(new LineBorder(new Color(80, 80, 80), 2));
+		colorJ1.setBounds(900, 270, 50, 50);
+		panelInicio.add(colorJ1);
+
+		colorJ2 = new JLabel("");
+		colorJ2.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(panelColorVisible)
+					cerrarPanelColor();
+				llamarPanelCambiarColor(colorJ2);
+				panelColorVisible = true;
+			}
+		});
+		colorJ2.setOpaque(true);
+		colorJ2.setBackground(new Color(0, 112, 192));
+		colorJ2.setBorder(new LineBorder(new Color(80, 80, 80), 2));
+		colorJ2.setBounds(900, 430, 50, 50);
+		panelInicio.add(colorJ2);
+
+		btnIniciar = new JButton("Jugar");
+		btnIniciar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				llamarPanelTablero(panelInicio);
+				game = new Juego(j1, j2);
+				jugadorActual = j1;
+				colocarFichas();
+				inicializarCasillas();
+				inicializarZonaDados();
+			}
+		});
+		btnIniciar.setModel(new MyButtonModel());
+		btnIniciar.setForeground(Color.BLACK);
+		btnIniciar.setBorder(new LineBorder(new Color(150, 0, 0), 4));
+		btnIniciar.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				if(btnIniciar.isEnabled())
+					btnIniciar.setBackground(Color.red);
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				if(btnIniciar.isEnabled())
+					btnIniciar.setBackground(Color.white);
+			}
+		});
+		btnIniciar.setFont(new Font("Arial", Font.BOLD, 30));
+		btnIniciar.setBackground(Color.white);
+		btnIniciar.setBounds(400, 580, 480, 50);
+		btnIniciar.setFocusable(false);
+		btnIniciar.setEnabled(false);
+		panelInicio.add(btnIniciar);
+
+		lblCorazon = new JLabel("");
+		lblCorazon.setIcon(new ImageIcon(Inicio.class.getResource("/imagenes/coraz dr.png")));
+		lblCorazon.setBounds(140, 254, 98, 98);
+		panelInicio.add(lblCorazon);
+
+		lblLabios = new JLabel("");
+		lblLabios.setIcon(new ImageIcon(Inicio.class.getResource("/imagenes/labios 96.png")));
+		lblLabios.setBounds(987, 500, 96, 96);
+		panelInicio.add(lblLabios);
+
+		lblFuego = new JLabel("");
+		lblFuego.setIcon(new ImageIcon(Inicio.class.getResource("/imagenes/emoji fuego 96.png")));
+		lblFuego.setBounds(208, 474, 96, 96);
+		panelInicio.add(lblFuego);
+
+		lblEmoji = new JLabel("");
+		lblEmoji.setIcon(new ImageIcon(Inicio.class.getResource("/imagenes/emoji enamorado 96.png")));
+		lblEmoji.setBounds(1110, 270, 98, 98);
+		panelInicio.add(lblEmoji);
+	}
+
+	/**
+	 * Llama al panel de inicio
+	 * @param ant el panel que va a ser sustituido por el panel de inicio
+	 */
+	private void panelInicio(JPanel ant){
+		contentPane.remove(ant);
+		repaint();
+		crearPanelInicio();
+		contentPane.add(panelInicio);
 	}
 }

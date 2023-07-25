@@ -8,8 +8,6 @@ import javax.swing.ImageIcon;
 
 public class Casilla {
 	
-	public static Point CASILLA_00 = new Point(0, 0);
-	
 	private String mensaje;
 	private Icon imagenP;
 	private ImageIcon imagenG;
