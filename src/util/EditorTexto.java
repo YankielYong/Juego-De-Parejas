@@ -18,6 +18,17 @@ public class EditorTexto {
 		}
 	}
 	
+	public static void textoAviso(SimpleAttributeSet attrs, JTextPane txt, String texto){
+		StyleConstants.setFontSize(attrs, 16);
+		StyleConstants.setBold(attrs, true);
+		StyleConstants.setItalic(attrs, false);
+		try {
+			txt.getStyledDocument().insertString(txt.getStyledDocument().getLength(), texto, attrs);
+		} catch (BadLocationException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public static void textoCursiva(SimpleAttributeSet attrs, JTextPane txt, String texto){
 		StyleConstants.setFontSize(attrs, 22);
 		StyleConstants.setItalic(attrs, true);

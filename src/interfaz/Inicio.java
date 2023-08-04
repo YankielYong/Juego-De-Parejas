@@ -4,8 +4,8 @@ import java.applet.Applet;
 import java.applet.AudioClip;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -109,6 +109,10 @@ public class Inicio extends JFrame {
 	private JButton btnRegresar;
 	private boolean mostrandoAyuda = false;
 	private int numCasilla;
+	/*
+	 * Panel Final
+	 */
+	private JPanel panelFinal;
 	/*
 	 * Panel donde se mostrara el tablero
 	 */
@@ -215,23 +219,21 @@ public class Inicio extends JFrame {
 	private Jugador j2;
 	private Jugador jugadorActual;
 
+	private int pantallaCompleta;
 
 	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Inicio frame = new Inicio();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
+		Dimension pantalla = Toolkit.getDefaultToolkit().getScreenSize();
+		int pant = 1;
+		if(pantalla.width == 1280 && pantalla.height == 720)
+			pant = 0;
+
+		Inicio frame = new Inicio(pant);
+		frame.setVisible(true);
 	}
 
-	public Inicio() {
+	public Inicio(int pant) {
 		cargarSonidos();
-
+		pantallaCompleta = pant;
 		/*-----------------------------------*\
 		|     Panel General Con Sus Datos     |
 		\*-----------------------------------*/
@@ -240,12 +242,30 @@ public class Inicio extends JFrame {
 		setIconImage(new ImageIcon(Inicio.class.getResource("/imagenes/logo.png")).getImage());
 		setUndecorated(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(0, 0, 1280, 720);
-		setLocationRelativeTo(null);
 
+		Aviso m = null;
+		if(pantallaCompleta == 0){
+			iniciarAppCompleta();
+		}
+		else{
+			m = new Aviso(this);
+			m.setVisible(true);
+			if(m.continuar())
+				iniciarApp();
+			else
+				System.exit(0);
+		}
+		
+	}
+	/**
+	 * Inicia la app en modo ventana
+	 */
+	private void iniciarApp(){
 		contentPane = new JPanel();
 		contentPane.setBackground(Color.GRAY);
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setBounds(0, 0, 1280, 720);
+		setLocationRelativeTo(null);
 		contentPane.setLayout(null);
 		setContentPane(contentPane);
 
@@ -390,6 +410,7 @@ public class Inicio extends JFrame {
 						}
 						break;
 					case 3: 
+					case 4:
 						try {
 							musicaCasilla.stop();
 							musicaCasilla = null;
@@ -411,6 +432,226 @@ public class Inicio extends JFrame {
 							e1.printStackTrace();
 						}
 					case 3: 
+					case 4:
+						try {
+							reproducirMusica(numCasilla);
+							break;
+						} catch (BasicPlayerException e1) {
+							e1.printStackTrace();
+						}
+					}
+				}
+			}
+		});
+		btnSonido.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				btnSonido.setContentAreaFilled(true);
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				btnSonido.setContentAreaFilled(false);
+			}
+		});
+		btnSonido.setBounds(80, 0, 40, 26);
+		btnSonido.setModel(new MyButtonModel());
+		btnSonido.setBackground(SystemColor.scrollbar);
+		btnSonido.setFocusable(false);
+		btnSonido.setContentAreaFilled(false);
+		btnSonido.setBorderPainted(false);
+		panelSuperior.add(btnSonido);
+
+		/*---------------------------------------------------------------*\
+		|     Panel Inicio para introducir los datos de los jugadores     |
+		\*---------------------------------------------------------------*/
+		crearPanelInicio();
+		contentPane.add(panelInicio);
+		numPanel = 1;
+
+		crearPanelAyuda();
+		
+		/*---------------------*\
+		|     Panel Tablero     |
+		\*---------------------*/
+		panelTablero = new JPanel();
+		panelTablero.setBackground(Color.WHITE);
+		panelTablero.setBounds(1, 27, 1278, 692);
+		panelTablero.setLayout(null);
+
+		panelDados = new JPanel();
+		panelDados.setBackground(new Color(200, 0, 0));
+		panelDados.setBorder(new EmptyBorder(5, 5, 5, 5));
+		panelDados.setBounds(1130, 15, 120, 100);
+		panelDados.setLayout(null);
+		panelTablero.add(panelDados);
+	}
+	/**
+	 * Inicia la app en pantalla completa
+	 */
+	private void iniciarAppCompleta(){
+		contentPane = new JPanel();
+		contentPane.setBackground(Color.GRAY);
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setLayout(null);
+		setBounds(0, 0, 1280, 720);
+		setLocationRelativeTo(null);
+		setExtendedState(MAXIMIZED_BOTH);
+		setContentPane(contentPane);
+
+
+		/*--------------------------------------------------------*\
+		|     Panel Superior Con Botones de cerrar y minimizar     |
+		\*--------------------------------------------------------*/
+		panelSuperior = new JPanel();
+		panelSuperior.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if(panelColorVisible)
+					cerrarPanelColor();
+			}
+		});
+		panelSuperior.setBackground(new Color(200, 0, 0));
+		panelSuperior.setBounds(1, 1, 1278, 26);
+		contentPane.add(panelSuperior);
+		panelSuperior.setLayout(null);
+
+		ImageIcon imgCerrar = new ImageIcon(Inicio.class.getResource("/imagenes/close.png"));
+		Image cerrarArr = imgCerrar.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+		Icon iconCerrar = new ImageIcon(cerrarArr);
+
+		btnCerrar = new JButton("");
+		btnCerrar.setIcon(iconCerrar);
+		btnCerrar.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				btnCerrar.setContentAreaFilled(true);
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				btnCerrar.setContentAreaFilled(false);
+			}
+		});
+		btnCerrar.setHorizontalTextPosition(SwingConstants.CENTER);
+		btnCerrar.setBackground(new Color(250, 128, 114));
+		btnCerrar.setModel(new MyButtonModel());
+		btnCerrar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.exit(0);
+			}
+		});
+		btnCerrar.setBounds(1238, 0, 40, 26);
+		btnCerrar.setFocusable(false);
+		btnCerrar.setContentAreaFilled(false);
+		btnCerrar.setBorderPainted(false);
+		panelSuperior.add(btnCerrar);
+
+		btnMinimizar = new JButton("");
+		btnMinimizar.setIcon(new ImageIcon(Inicio.class.getResource("/imagenes/minimize.png")));
+		btnMinimizar.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				btnMinimizar.setContentAreaFilled(true);
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				btnMinimizar.setContentAreaFilled(false);
+			}
+		});
+		btnMinimizar.setHorizontalTextPosition(SwingConstants.CENTER);
+		btnMinimizar.setBackground(SystemColor.scrollbar);
+		btnMinimizar.setModel(new MyButtonModel());
+		btnMinimizar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				btnMinimizar.setContentAreaFilled(false);
+				setExtendedState(ICONIFIED);
+			}
+		});
+		btnMinimizar.setBounds(1198, 0, 40, 26);
+		btnMinimizar.setFocusable(false);
+		btnMinimizar.setContentAreaFilled(false);
+		btnMinimizar.setBorderPainted(false);
+		panelSuperior.add(btnMinimizar);
+
+		btnAyuda = new JButton();
+		btnAyuda.setBorder(null);
+		btnAyuda.setFont(new Font("Arial", Font.BOLD, 15));
+		btnAyuda.setForeground(Color.BLACK);
+		btnAyuda.setText("Ayuda");
+		btnAyuda.setIcon(new ImageIcon(Inicio.class.getResource("/imagenes/ayuda.png")));
+		btnAyuda.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(!mostrandoAyuda && sePuedeJugar){
+					mostrandoAyuda = true;
+					mostrarAyuda();
+					scrollPane.getVerticalScrollBar().setValue(0);
+				}
+			}
+		});
+		btnAyuda.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				btnAyuda.setContentAreaFilled(true);
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				btnAyuda.setContentAreaFilled(false);
+			}
+		});
+		btnAyuda.setBounds(0, 0, 80, 26);
+		btnAyuda.setModel(new MyButtonModel());
+		btnAyuda.setBackground(SystemColor.scrollbar);
+		btnAyuda.setFocusable(false);
+		btnAyuda.setContentAreaFilled(false);
+		btnAyuda.setBorderPainted(false);
+		panelSuperior.add(btnAyuda);
+
+		ImageIcon img = new ImageIcon(Inicio.class.getResource("/imagenes/sound on.png"));
+		Image image = img.getImage().getScaledInstance(22, 22, Image.SCALE_SMOOTH);
+		iconSoundOn = new ImageIcon(image);
+		img = new ImageIcon(Inicio.class.getResource("/imagenes/sound off.png"));
+		image = img.getImage().getScaledInstance(22, 22, Image.SCALE_SMOOTH);
+		iconSoundOff = new ImageIcon(image);
+
+		btnSonido = new JButton();
+		btnSonido.setBorder(null);
+		btnSonido.setIcon(iconSoundOn);
+		btnSonido.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(btnSonido.getIcon().equals(iconSoundOn)){
+					btnSonido.setIcon(iconSoundOff);
+					sound = false;
+					switch(numPanel){
+					case 2:
+						try {
+							musicaFondo.pause();
+						} catch (BasicPlayerException e1) {
+							e1.printStackTrace();
+						}
+						break;
+					case 3: 
+					case 4:
+						try {
+							musicaCasilla.stop();
+							musicaCasilla = null;
+						} catch (BasicPlayerException e1) {
+							e1.printStackTrace();
+						}
+						break;
+					}
+				}
+				else{
+					btnSonido.setIcon(iconSoundOn);
+					sound = true;
+					switch(numPanel){
+					case 2:
+						try {
+							musicaFondo.resume();
+							break;
+						} catch (BasicPlayerException e1) {
+							e1.printStackTrace();
+						}
+					case 3: 
+					case 4:
 						try {
 							reproducirMusica(numCasilla);
 							break;
@@ -461,7 +702,6 @@ public class Inicio extends JFrame {
 		panelDados.setBounds(1130, 15, 120, 100);
 		panelDados.setLayout(null);
 		panelTablero.add(panelDados);
-
 	}
 
 	/**
@@ -2301,7 +2541,7 @@ public class Inicio extends JFrame {
 					llamarPanelTablero(panelCasilla);
 				}
 				else{
-					System.exit(0);
+					ponerPanelFinal();
 				}
 			}
 		});
@@ -2323,7 +2563,7 @@ public class Inicio extends JFrame {
 					llamarPanelTablero(panelCasilla);
 				}
 				else{
-					System.exit(0);
+					ponerPanelFinal();
 				}
 			}
 		});
@@ -2357,6 +2597,7 @@ public class Inicio extends JFrame {
 			case KeyEvent.VK_UP: txtJ1.requestFocus(); break;
 			case KeyEvent.VK_ENTER: 
 				if(btnIniciar.isEnabled()){
+					contentPane.remove(scrollPane);
 					llamarPanelTablero(panelInicio);
 					game = new Juego(j1, j2);
 					jugadorActual = j1;
@@ -2436,11 +2677,11 @@ public class Inicio extends JFrame {
 		lblTitulo.setIcon(new ImageIcon(Inicio.class.getResource("/imagenes/titulo.png")));
 		lblTitulo.setBounds(270, 40, 1000, 100);
 		panelInicio.add(lblTitulo);
-		
+
 		ImageIcon img = new ImageIcon(Inicio.class.getResource("/imagenes/logo inicio.png"));
 		Image image = img.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
 		Icon iconLogo = new ImageIcon(image);
-		
+
 		lblLogo = new JLabel();
 		lblLogo.setIcon(iconLogo);
 		lblLogo.setBounds(60, 0, 200, 200);
@@ -2559,6 +2800,7 @@ public class Inicio extends JFrame {
 		btnIniciar = new JButton("Jugar");
 		btnIniciar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				contentPane.remove(scrollPane);
 				llamarPanelTablero(panelInicio);
 				game = new Juego(j1, j2);
 				jugadorActual = j1;
@@ -2636,6 +2878,11 @@ public class Inicio extends JFrame {
 			repaint();
 			contentPane.add(scrollPane);
 			break;
+		case 4:
+			contentPane.remove(panelFinal);
+			repaint();
+			contentPane.add(scrollPane);
+			break;
 		}
 	}
 
@@ -2692,11 +2939,11 @@ public class Inicio extends JFrame {
 		lblTitulo.setIcon(new ImageIcon(Inicio.class.getResource("/imagenes/titulo.png")));
 		lblTitulo.setBounds(270, 40, 1000, 100);
 		panelAyuda.add(lblTitulo);
-		
+
 		ImageIcon img = new ImageIcon(Inicio.class.getResource("/imagenes/logo inicio.png"));
 		Image image = img.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
 		Icon iconLogo = new ImageIcon(image);
-		
+
 		lblLogo = new JLabel();
 		lblLogo.setIcon(iconLogo);
 		lblLogo.setBounds(60, 0, 200, 200);
@@ -3086,6 +3333,10 @@ public class Inicio extends JFrame {
 					break;
 				case 3:
 					mostrarCasilla(numCasilla);
+					break;
+				case 4:
+					ponerPanelFinal();
+					break;
 				}
 			}
 		});
@@ -3107,6 +3358,8 @@ public class Inicio extends JFrame {
 		btnRegresar.setBounds(500, 4670, 280, 50);
 		btnRegresar.setFocusable(false);
 		panelAyuda.add(btnRegresar);
+		
+		contentPane.add(scrollPane);
 	}
 
 	/**
@@ -3373,5 +3626,50 @@ public class Inicio extends JFrame {
 				break;
 			}
 		}
+	}
+
+	/**
+	 * Pone la imagen final del juego
+	 */
+	private void ponerPanelFinal(){
+		panelFinal = new JPanel();
+		panelFinal.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				System.exit(0);
+			}
+		});
+		panelFinal.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				System.exit(0);
+			}
+		});
+		panelFinal.setBackground(Color.black);
+		panelFinal.setBounds(1, 27, 1278, 692);
+		panelFinal.setLayout(null);
+
+		JLabel lblLetrero = new JLabel();
+		lblLetrero.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				System.exit(0);
+			}
+		});
+		lblLetrero.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				System.exit(0);
+			}
+		});
+		lblLetrero.setIcon(new ImageIcon(Inicio.class.getResource("/imagenes/imagen final.png")));
+		lblLetrero.setBounds(0, 0, 1278, 692);
+		panelFinal.add(lblLetrero);
+
+		contentPane.remove(panelCasilla);
+		contentPane.add(panelFinal);
+		repaint();
+		numPanel = 4;
+		lblLetrero.requestFocus();
 	}
 }
